@@ -1,0 +1,113 @@
+<div class="min-h-screen flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8 bg-surface-0 transition-colors duration-300">
+  <div class="w-full max-w-md p-8 space-y-8 bg-surface-50 rounded-xl shadow-lg">
+    <div class="flex justify-end">
+      <button 
+        (click)="toggleTheme()" 
+        type="button"
+        class="p-2 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+        [attr.aria-label]="(themeService.isDark() ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro')"
+      >
+        <i [class]="themeService.isDark() ? 'pi pi-sun' : 'pi pi-moon'" class="text-lg"></i>
+      </button>
+    </div>
+
+    <!-- Logo y título -->
+    <div class="text-center">
+      <div class="flex justify-center mb-4">
+        <img src="logo.svg" alt="Logo" class="h-16 w-auto">
+      </div>
+      <h2 class="mt-6 text-3xl font-extrabold text-text">
+        Bienvenido de nuevo
+      </h2>
+      <p class="mt-2 text-sm text-text-secondary">
+        ¿No tienes una cuenta? 
+        <a href="#" class="font-medium text-primary-600 hover:text-primary-500">
+          ¡Crea una ahora!
+        </a>
+      </p>
+    </div>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+      <div class="rounded-md shadow-sm space-y-4">
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-text-secondary mb-1">
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            [(ngModel)]="email"
+            required
+            class="appearance-none relative block w-full px-3 py-2.5 border border-surface-300 rounded-lg placeholder-surface-500 text-text focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm bg-surface-50 dark:bg-surface-100 transition-colors duration-200"
+            placeholder="tu@ejemplo.com"
+          >
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="password" class="block text-sm font-medium text-text-secondary mb-1">
+              Contraseña
+            </label>
+            <div class="text-sm">
+              <a href="#" class="font-medium text-primary-600 hover:text-primary-500">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+          </div>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            [(ngModel)]="password"
+            required
+            class="appearance-none relative block w-full px-3 py-2.5 border border-surface-300 rounded-lg placeholder-surface-500 text-text focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm bg-surface-50 dark:bg-surface-100 transition-colors duration-200"
+            placeholder="••••••••"
+          >
+        </div>
+
+        <!-- Recordarme -->
+        <div class="flex items-center">
+          <input
+            id="remember-me"
+            name="remember-me"
+            type="checkbox"
+            [(ngModel)]="rememberMe"
+            [ngModelOptions]="{standalone: true}"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-surface-300 rounded"
+          >
+          <label for="remember-me" class="ml-2 block text-sm text-text-secondary">
+            Recordar mi sesión
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-6">
+        <button
+          type="submit"
+          [disabled]="loading"
+          [class.opacity-75]="loading"
+          class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-[1.02] disabled:cursor-not-allowed"
+        >
+          <span *ngIf="!loading">Iniciar sesión</span>
+          <span *ngIf="loading" class="flex items-center">
+            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Iniciando sesión...
+          </span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Pie de página -->
+    <div class="text-center text-sm text-[var(--text-secondary)] mt-8">
+      &copy; 2023 FriendlyHand. Todos los derechos reservados.
+    </div>
+  </div>
+
+</div>

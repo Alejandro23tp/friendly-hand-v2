@@ -1,0 +1,82 @@
+<div class="fixed inset-y-0 left-0 z-50 w-20 bg-surface-0 dark:bg-surface-50 shadow-xl border-r border-surface-100 dark:border-surface-700 transition-all duration-300 ease-in-out flex flex-col h-screen">
+  <!-- Logo -->
+  <div class="flex items-center justify-center h-20 px-4">
+    <div class="relative group">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+      <img 
+        src="/logo.svg" 
+        alt="Friendly Logo" 
+        class="relative h-10 w-auto transition-all duration-300 transform group-hover:scale-105 z-10"
+      />
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 flex flex-col justify-center px-2">
+    <ul class="space-y-4">
+      <li *ngFor="let item of menuItems" class="relative group">
+        <a 
+          [routerLink]="item.route" 
+          [title]="item.label"
+          class="flex items-center justify-center h-14 w-14 mx-auto rounded-xl transition-all duration-300 ease-out"
+          [ngClass]="{
+            'bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 shadow-sm': isActive(item.route),
+            'text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700/50 hover:text-primary-500 dark:hover:text-primary-300': !isActive(item.route)
+          }"
+        >
+          <i [class]="item.icon + ' text-lg transition-all duration-300 group-hover:scale-110'" style="font-size: 1.15rem"></i>
+          <span class="absolute left-full ml-4 px-3 py-1.5 bg-surface-0 dark:bg-surface-900 text-sm font-medium rounded-md shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none border border-surface-100 dark:border-surface-700">
+            {{item.label}}
+          </span>
+        </a>
+        <div 
+          *ngIf="isActive(item.route)" 
+          class="absolute -left-0.5 top-1/2 transform -translate-y-1/2 w-1 h-8 bg-gradient-to-b from-primary-500 to-primary-400 dark:from-primary-400 dark:to-primary-300 rounded-r-md transition-all duration-300"
+        ></div>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bottom Menu -->
+  <div class="mt-auto pb-6 pt-4 px-2 space-y-2">
+    <!-- Theme Toggle -->
+    <div class="relative group">
+      <button 
+        (click)="toggleTheme()" 
+        class="flex items-center justify-center h-14 w-14 mx-auto bg-transparent border-none hover:bg-transparent"
+        [title]="isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'"
+      >
+        <i class="pi transition-all duration-300 group-hover:scale-110 text-surface-600 dark:text-surface-300 hover:text-primary-500 dark:hover:text-primary-300" 
+           [ngClass]="isDark ? 'pi-sun' : 'pi-moon'" 
+           style="font-size: 1.25rem">
+        </i>
+      </button>
+    </div>
+    
+    <!-- Logout Button -->
+    <div class="relative group">
+      <button 
+        (click)="logout()"
+        class="flex items-center justify-center h-14 w-14 mx-auto bg-transparent border-none hover:bg-transparent"
+        title="Cerrar sesión"
+      >
+        <i class="pi pi-sign-out transition-all duration-300 group-hover:scale-110 text-surface-600 dark:text-surface-300 hover:text-red-500 dark:hover:text-red-400" 
+           style="font-size: 1.25rem">
+        </i>
+      </button>
+    </div>
+    
+    <div class="w-full px-2 pt-2 mt-2">
+      <div class="flex flex-col items-center">
+        <p-avatar 
+          icon="pi pi-user" 
+          styleClass="cursor-pointer shadow-sm hover:shadow transition-all duration-200"
+          [style]="{'background-color': 'var(--primary-100)', 'color': 'var(--primary-700)', 'border': '2px solid var(--surface-200)'}" 
+          shape="circle" 
+          size="normal"
+          [title]="'Perfil de usuario'"
+        ></p-avatar>
+      </div>
+    </div>
+  </div>
+</div>

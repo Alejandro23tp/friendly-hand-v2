@@ -1,0 +1,549 @@
+.sidebar-icon {
+  position: relative;
+  
+  &:hover i {
+    transform: scale(1.1);
+  }
+}
+
+.menu-icon-animate i {
+  transition: transform 0.2s ease-in-out;
+}
+
+:host ::ng-deep {
+  .p-avatar {
+    &:hover {
+      transform: translateY(-2px);
+    }
+    transition: transform 0.2s ease;
+  }
+}
+
+.main-content {
+  scroll-behavior: smooth;
+}
+
+.nav-item-active {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 20px;
+    background-color: var(--primary-500);
+    border-radius: 0 4px 4px 0;
+  }
+}
+
+// PrimeNG Select Component Theming
+:host ::ng-deep {
+  // Root element styles
+  .p-select {
+    // Light theme colors
+    --p-select-background: #ffffff;
+    --p-select-border-color: #ced4da;
+    --p-select-color: #212529;
+    --p-select-hover-border-color: #80bdff;
+    --p-select-focus-border-color: #4d94ff;
+    --p-select-focus-ring-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    --p-select-placeholder-color: #6c757d;
+    --p-select-clear-icon-color: #6c757d;
+    --p-select-dropdown-color: #6c757d;
+    --p-select-overlay-background: #ffffff;
+    --p-select-overlay-border-color: rgba(0, 0, 0, 0.15);
+    --p-select-option-color: #212529;
+    --p-select-option-focus-background: #f8f9fa;
+    --p-select-option-focus-color: #212529;
+    --p-select-option-selected-background: #e7f1ff;
+    --p-select-option-selected-color: #0d6efd;
+    --p-select-option-selected-focus-background: #d7e5ff;
+    --p-select-checkmark-color: #0d6efd;
+    --p-select-option-hover-bg: #f1f3f5;
+    --p-select-option-selected-hover-bg: #e1ebff;
+    width: 100%;
+    background: var(--p-select-background, #ffffff);
+    border: 1px solid var(--p-select-border-color, #ced4da);
+    border-radius: var(--p-select-border-radius, 6px);
+    transition: border-color var(--p-select-transition-duration, 0.2s) ease-in-out, 
+                box-shadow var(--p-select-transition-duration, 0.2s) ease-in-out;
+    
+    // Hover state
+    &:not(.p-disabled):hover {
+      border-color: var(--p-select-hover-border-color);
+      background: var(--p-select-hover-bg, #f8f9fa);
+    }
+    
+    // Focus state
+    &:focus, &.p-focus {
+      border-color: var(--p-select-focus-border-color, #80bdff);
+      box-shadow: 0 0 0 0.2rem var(--p-select-focus-ring-shadow, rgba(0, 123, 255, 0.25));
+    }
+    
+    // Label and placeholder
+    .p-select-label {
+      color: var(--p-select-color, #495057);
+      padding: var(--p-select-padding-y, 0.5rem) var(--p-select-padding-x, 0.75rem);
+      
+      &.p-placeholder {
+        color: var(--p-select-placeholder-color, #6c757d);
+      }
+    }
+    
+    // Icons
+    .p-select-clear-icon {
+      color: var(--p-select-clear-icon-color, #6c757d);
+      
+      &:hover {
+        color: var(--p-select-clear-icon-hover-color, #495057);
+      }
+    }
+    
+    .p-select-dropdown-icon {
+      color: var(--p-select-dropdown-color, #6c757d);
+    }
+  }
+  
+  // Dropdown panel - Light theme by default
+  .p-select-overlay {
+    background: var(--p-select-overlay-background, #ffffff) !important;
+    background-color: var(--p-select-overlay-background, #ffffff) !important;
+    border: 1px solid var(--p-select-overlay-border-color, rgba(0, 0, 0, 0.15));
+    border-radius: var(--p-select-overlay-border-radius, 6px);
+    box-shadow: var(--p-select-overlay-shadow, 0 2px 12px 0 rgba(0, 0, 0, 0.1));
+    z-index: 1100 !important;
+    
+    // Header with filter
+    .p-select-header {
+      padding: var(--p-select-list-header-padding, 0.5rem 1rem);
+      border-bottom: 1px solid var(--surface-200);
+      
+      .p-select-filter {
+        width: 100%;
+        padding: var(--p-select-padding-y, 0.5rem) var(--p-select-padding-x, 0.75rem);
+        background: var(--p-select-overlay-background, #ffffff);
+        border: 1px solid var(--p-select-border-color, #ced4da);
+        color: var(--p-select-color, #495057);
+        border-radius: var(--p-select-border-radius, 4px);
+        
+        &:focus {
+          border-color: var(--p-select-focus-border-color, #80bdff);
+          box-shadow: 0 0 0 0.2rem var(--p-select-focus-ring-shadow, rgba(0, 123, 255, 0.25));
+        }
+      }
+    }
+    
+    // List container
+    .p-select-list-container {
+      padding: var(--p-select-list-padding, 0.5rem 0);
+      
+      .p-select-list {
+        gap: var(--p-select-list-gap, 0.25rem);
+        
+        // Individual items
+        .p-select-item {
+          padding: var(--p-select-option-padding, 0.5rem 1rem);
+          color: var(--p-select-option-color, #212529);
+          border-radius: var(--p-select-option-border-radius, 4px);
+          
+          // Hover state
+          &:not(.p-highlight):not(.p-disabled):hover {
+            background: var(--p-select-option-hover-bg, #f1f3f5);
+            color: var(--p-select-option-color, #212529);
+          }
+          
+          // Selected state
+          // Selected state with better contrast
+          &.p-highlight {
+            background: var(--p-select-option-selected-background, #e7f1ff);
+            color: var(--p-select-option-selected-color, #0d6efd);
+            font-weight: 500;
+            
+            .p-select-option-check-icon {
+              color: var(--p-select-checkmark-color, #0d6efd);
+            }
+            
+            &:hover {
+              background: var(--p-select-option-selected-hover-bg, #d7e5ff);
+              color: var(--p-select-option-selected-color, #0d6efd);
+            }
+          }
+          
+          // Checkmark icon
+          .p-select-option-check-icon {
+            color: var(--p-select-checkmark-color, #007bff);
+            margin-left: var(--p-select-checkmark-gutter-end, 0.5rem);
+          }
+        }
+        
+        // Option groups
+        .p-select-option-group {
+          .p-select-option-group-label {
+            padding: var(--p-select-option-group-padding, 0.5rem 1rem);
+            background: var(--p-select-option-group-background, #f8f9fa);
+            color: var(--p-select-option-group-color, #6c757d);
+            font-weight: var(--p-select-option-group-font-weight, 600);
+          }
+        }
+      }
+    }
+    
+    // Empty message
+    .p-select-empty-message {
+      padding: var(--p-select-empty-message-padding, 0.75rem 1.25rem);
+      color: var(--p-select-color, #6c757d);
+      text-align: center;
+    }
+  }
+  
+  // Dark theme overrides using global theme variables
+  :host-context(.dark),
+  :host-context(.p-component-dark),
+  :host-context(body.dark),
+  :host-context(body.p-component-dark),
+  .dark,
+  .p-component-dark,
+  body.dark,
+  body.p-component-dark {
+    .p-select, 
+    .p-select-overlay,
+    .p-inputtext[readonly] {
+      // Root element tokens
+      --p-select-background: var(--surface-0, #09090b);
+      --p-select-border-color: var(--surface-200, #424243);
+      --p-select-color: var(--text-color, #f3f4f6);
+      --p-select-hover-border-color: var(--primary-400, #60a5fa);
+      --p-select-focus-border-color: var(--primary-500, #3b82f6);
+      --p-select-focus-ring-shadow: 0 0 0 0.2rem rgba(240, 242, 246, 0.3);
+      --p-select-placeholder-color: var(--surface-500, #8e8e8e);
+      --p-select-clear-icon-color: var(--surface-500, #8e8e8e);
+      
+      // Dropdown tokens
+      --p-select-dropdown-color: var(--text-color, #f3f4f6);
+      --p-select-overlay-background: var(--surface-50, #18181B);
+      --p-select-overlay-background-rgb: 24, 24, 27; // RGB equivalent of #18181B
+      --p-select-overlay-border-color: var(--surface-200, #424243);
+      --p-select-overlay-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+      
+      // Option tokens
+      --p-select-option-color: var(--text-color, #f3f4f6);
+      --p-select-option-focus-background: var(--surface-100, #2c2c2d);
+      --p-select-option-selected-background: var(--primary-600, #2563eb);
+      --p-select-option-selected-color: #ffffff;
+      --p-select-option-selected-focus-background: var(--primary-700, #1d4ed8);
+      --p-select-option-padding: 0.5rem 1rem;
+      --p-select-option-border-radius: 0.25rem;
+      
+      // Checkmark and clear icon
+      --p-select-checkmark-color: #ffffff;
+      --p-select-clear-icon-hover-color: var(--primary-300, #93c5fd);
+      
+      // Group tokens
+      --p-select-option-group-background: var(--surface-100, #2c2c2d);
+      --p-select-option-group-color: var(--surface-500, #8e8e8e);
+      --p-select-option-group-font-weight: 600;
+      
+      // List tokens
+      --p-select-list-padding: 0.25rem 0;
+      --p-select-list-gap: 0.125rem;
+      
+      background: var(--p-select-background) !important;
+      border-color: var(--p-select-border-color) !important;
+      color: var(--p-select-color) !important;
+      
+      // Label and icons
+      .p-select-label {
+        color: var(--p-select-color);
+        
+        &.p-placeholder {
+          color: var(--p-select-placeholder-color);
+        }
+      }
+      
+      .p-select-clear-icon,
+      .p-select-dropdown-icon {
+        color: var(--p-select-clear-icon-color);
+        
+        &:hover {
+          color: var(--p-select-clear-icon-hover-color);
+        }
+      }
+      
+      // Hover and focus states
+      &:not(.p-disabled):hover {
+        border-color: var(--p-select-hover-border-color);
+      }
+      
+      &:focus, 
+      &.p-focus,
+      &.p-focus-within {
+        border-color: var(--p-select-focus-border-color);
+        box-shadow: var(--p-select-focus-ring-shadow);
+      }
+      
+      // Dropdown panel
+      .p-select-overlay {
+        background: var(--p-select-overlay-background) !important;
+        background-color: var(--p-select-overlay-background) !important;
+        border-color: var(--p-select-overlay-border-color) !important;
+        box-shadow: var(--p-select-overlay-shadow) !important;
+        z-index: 1100 !important; // Ensure it's above other elements
+        z-index: 1100 !important; // Ensure it's above other elements
+        
+        .p-select-list {
+          padding: var(--p-select-list-padding);
+          gap: var(--p-select-list-gap);
+          
+          .p-select-option {
+            color: var(--p-select-option-color);
+            padding: var(--p-select-option-padding);
+            border-radius: var(--p-select-option-border-radius);
+            
+            &:not(.p-highlight):not(.p-disabled):hover {
+              background: var(--p-select-option-focus-background);
+            }
+            
+            &.p-highlight {
+              background: var(--p-select-option-selected-background);
+              color: var(--p-select-option-selected-color);
+              
+              .p-select-option-check-icon {
+                color: var(--p-select-checkmark-color);
+              }
+              
+              &:hover {
+                background: var(--p-select-option-selected-focus-background);
+              }
+            }
+          }
+          
+          .p-select-option-group {
+            background: var(--p-select-option-group-background);
+            color: var(--p-select-option-group-color);
+            font-weight: var(--p-select-option-group-font-weight);
+          }
+        }
+      }
+    }
+    
+    .p-select-overlay {
+      background: var(--p-select-overlay-background);
+      border-color: var(--p-select-overlay-border-color);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+      
+      .p-select-header {
+        padding: 0.5rem 1rem;
+        border-bottom: 1px solid var(--surface-700);
+        
+        .p-select-filter {
+          background: var(--surface-700);
+          border-color: var(--surface-600);
+          color: var(--text-color);
+          
+          &:focus {
+            border-color: var(--p-select-focus-border-color);
+            box-shadow: var(--p-select-focus-ring-shadow);
+          }
+        }
+      }
+      
+      .p-select-list {
+        .p-select-item {
+          color: var(--p-select-option-color);
+          
+          &:not(.p-highlight):not(.p-disabled):hover {
+            background: var(--p-select-option-hover-bg);
+            color: var(--p-select-option-color);
+          }
+          
+          &.p-highlight {
+            background: var(--p-select-option-selected-background);
+            color: var(--p-select-option-selected-color);
+            font-weight: 500;
+            
+            .p-select-option-check-icon {
+              color: var(--p-select-checkmark-color);
+            }
+            
+            &:hover {
+              background: var(--p-select-option-selected-hover-bg);
+              color: var(--p-select-option-selected-color);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos mejorados para diálogos
+:host ::ng-deep {
+  .p-dialog {
+    max-width: 95vw;
+    width: 100% !important;
+    max-width: 500px;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    
+    @media (max-width: 640px) {
+      width: 95% !important;
+      margin: 0.5rem;
+    }
+    
+    .p-dialog-header {
+      background: var(--surface-0);
+      border-bottom: 1px solid var(--surface-200);
+      padding: 1.25rem 1.5rem;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      
+      .p-dialog-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--surface-900);
+      }
+      
+      .p-dialog-header-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+        
+        &:hover {
+          background: var(--surface-100);
+          color: var(--surface-900);
+        }
+      }
+    }
+    
+    .p-dialog-content {
+      background: var(--surface-0);
+      color: var(--text-color);
+      padding: 1.5rem;
+      
+      .field {
+        margin-bottom: 1.25rem;
+        
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: var(--surface-700);
+          font-size: 0.875rem;
+        }
+        
+        .p-inputtext,
+        .p-inputnumber,
+        .p-inputnumber-input,
+        .p-dropdown,
+        .p-calendar,
+        .p-password {
+          width: 100%;
+          border-radius: 8px;
+          border: 1px solid var(--surface-300);
+          background: var(--surface-0);
+          color: var(--text-color);
+          padding: 0.625rem 1rem;
+          font-size: 0.9375rem;
+          transition: all 0.2s;
+          box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+          
+          &:hover {
+            border-color: var(--primary-400);
+          }
+          
+          &:focus {
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+          }
+          
+          &::placeholder {
+            color: var(--surface-400);
+          }
+        }
+        
+        .p-input-icon-right > i:first-of-type {
+          right: 1rem;
+          color: var(--surface-500);
+        }
+        
+        .p-inputnumber-buttons-stacked .p-button.p-inputnumber-button {
+          background: var(--surface-100);
+          border-color: var(--surface-300);
+          color: var(--surface-700);
+          
+          &:hover {
+            background: var(--surface-200);
+          }
+          
+          &.p-inputnumber-button-up {
+            border-top-right-radius: 8px;
+          }
+          
+          &.p-inputnumber-button-down {
+            border-bottom-right-radius: 8px;
+          }
+        }
+      }
+    }
+    
+    .p-dialog-footer {
+      background: var(--surface-0);
+      border-top: 1px solid var(--surface-200);
+      padding: 1.25rem 1.5rem;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      
+      .p-button {
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.2s;
+        
+        &.p-button-text {
+          color: var(--surface-700);
+          
+          &:hover {
+            background: var(--surface-100);
+          }
+        }
+        
+        &.p-button-success {
+          background: var(--primary-500);
+          border-color: var(--primary-500);
+          
+          &:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+          }
+        }
+      }
+    }
+  }
+  
+  // Estilos específicos para el diálogo de préstamos
+  .loan-dialog {
+    .p-dialog-content {
+      .field-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+        
+        @media (max-width: 480px) {
+          grid-template-columns: 1fr;
+        }
+      }
+    }
+  }
+}
+
+
+

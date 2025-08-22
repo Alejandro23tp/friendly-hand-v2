@@ -1,0 +1,142 @@
+<p-dialog [(visible)]="visible" [modal]="true" [style]="{width: '450px'}" [draggable]="false" [resizable]="false"
+          [closable]="!loading" [closeOnEscape]="!loading" [dismissableMask]="!loading" (onHide)="onHideDialog()">
+  
+  <ng-template pTemplate="header">
+    <div class="flex flex-col w-full">
+      <h2 class="text-black dark:text-white">{{ editMode ? 'Editar' : 'Nuevo' }} Participante</h2>
+      <span *ngIf="editMode && formData.id" class="text-sm text-gray-500 dark:text-gray-400">ID: {{ formData.id }}</span>
+    </div>
+  </ng-template>
+  
+  <div class="p-fluid">
+    <div class="field">
+      <label for="name" class="block text-sm font-medium mb-2">
+        Nombre Completo <span class="text-red-500">*</span>
+      </label>
+      <input id="name" type="text" pInputText [(ngModel)]="formData.name" [disabled]="loading"
+            class="w-full" [ngClass]="{'p-invalid': submitted && !formData.name?.trim()}" 
+            [autocomplete]="editMode ? 'name' : 'off'" required />
+      <small *ngIf="submitted && !formData.name?.trim()" class="p-error block mt-1">
+        <i class="pi pi-exclamation-circle mr-1"></i> El nombre es requerido
+      </small>
+    </div>
+    
+    <div class="field mt-4">
+      <label for="email" class="block text-sm font-medium mb-2">
+        Email <span class="text-red-500">*</span>
+      </label>
+      <input id="email" type="email" pInputText [(ngModel)]="formData.email" [disabled]="loading"
+            class="w-full" [ngClass]="{'p-invalid': submitted && !formData.email?.trim()}"
+            [autocomplete]="editMode ? 'email' : 'off'" required />
+      <small *ngIf="submitted && !formData.email?.trim()" class="p-error block mt-1">
+        <i class="pi pi-question-circle mr-1"></i> El email es requerido
+      </small>
+      <small *ngIf="submitted && formData.email && !isValidEmail(formData.email)" class="p-error block mt-1">
+        <i class="pi pi-exclamation-circle mr-1"></i> Ingrese un email válido
+      </small>
+    </div>
+
+    <div class="field mt-4">
+      <div class="flex items-center justify-between">
+        <label for="isNewToggle" class="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center cursor-pointer">
+          <span>Participante Nuevo</span>
+          <i class="pi pi-question-circle ml-2 text-gray-500 dark:text-gray-400" 
+            pTooltip="Marque esta opción si es la primera vez que el participante asiste al grupo" 
+            tooltipPosition="top" style="font-size: 0.9rem"></i>
+        </label>
+        
+        <div class="flex items-center">
+          <label class="cursor-pointer">
+            <!-- Toggle Container -->
+            <div class="relative">
+              <input type="checkbox" 
+                    id="isNewToggle"
+                    [(ngModel)]="formData.isNew" 
+                    [disabled]="loading"
+                    (ngModelChange)="onToggleChange()"
+                    class="sr-only">
+              <!-- Track -->
+              <div class="w-10 h-5 flex items-center rounded-full p-0.5 transition-colors duration-300"
+                  [class.bg-green-500]="formData.isNew"
+                  [class.bg-gray-300]="!formData.isNew"
+                  [class.opacity-50]="loading">
+                <!-- Thumb -->
+                <div class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300"
+                    [class.translate-x-5]="formData.isNew">
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+    <style>
+      .toggle-checkbox:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .toggle-checkbox:disabled + .toggle-label {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .toggle-label {
+        background-color: #10B981 !important;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .toggle-checkbox:not(:checked) + .toggle-label {
+        background-color: #E5E7EB !important;
+      }
+    </style>
+    
+    <div class="field mt-4" *ngIf="!editMode">
+      <label for="password" class="block text-sm font-medium mb-2">
+        Contraseña <span class="text-red-500">*</span>
+      </label>
+      <div class="p-inputgroup">
+        <input [type]="showPassword ? 'text' : 'password'" id="password" pInputText 
+              [(ngModel)]="formData.password" [disabled]="loading" class="w-full"
+              (input)="updatePassword($event)" required
+              [ngClass]="{'p-invalid': submitted && !formData.password?.trim()}"
+              [autocomplete]="'new-password'" />
+        <button type="button" pButton pRipple [icon]="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                class="p-button-text" (click)="showPassword = !showPassword"
+                [pTooltip]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+        </button>
+      </div>
+      <small *ngIf="submitted && !formData.password?.trim()" class="p-error block mt-1">
+        <i class="pi pi-exclamation-circle mr-1"></i> La contraseña es requerida
+      </small>
+      <small *ngIf="!editMode" class="text-xs text-500 block mt-1">
+        <i class="pi pi-info-circle mr-1"></i> Contraseña generada: {{ formData.password || defaultPassword }}
+      </small>
+    </div>
+    
+    <div class="field mt-4" *ngIf="isAdmin">
+      <label for="shares" class="block text-sm font-medium mb-2">
+        Acciones
+      </label>
+      <p-inputNumber id="shares" [(ngModel)]="formData.shares" [min]="0" [showButtons]="true" 
+                    buttonLayout="horizontal" [disabled]="loading" class="w-full"
+                    inputId="shares" [inputStyle]="{'text-align': 'center'}">
+        <ng-template pTemplate="decrementbutton">
+          <button pButton type="button" icon="pi pi-minus" class="p-button-text"
+                  [disabled]="loading"></button>
+        </ng-template>
+        <ng-template pTemplate="incrementbutton">
+          <button pButton type="button" icon="pi pi-plus" class="p-button-text"
+                  [disabled]="loading"></button>
+        </ng-template>
+      </p-inputNumber>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <button pButton pRipple icon="pi pi-times" label="Cancelar" class="p-button-text"
+            [disabled]="loading" (click)="onHideDialog()" type="button"></button>
+    <button pButton pRipple [icon]="loading ? 'pi pi-spinner pi-spin' : 'pi pi-check'" 
+            [label]="editMode ? 'Actualizar' : 'Guardar'" class="p-button-primary"
+            [disabled]="loading || !formData.name?.trim() || !formData.email?.trim() || (!editMode && !formData.password?.trim())" 
+            (click)="save()" type="button"
+            [loading]="loading"></button>
+  </ng-template>
+</p-dialog>

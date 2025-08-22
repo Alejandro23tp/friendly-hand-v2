@@ -1,0 +1,97 @@
+/* Estilos para el tema oscuro */
+:host ::ng-deep {
+  /* Estilos para el input de contraseña */
+  .p-password {
+    width: 100%;
+    
+    .p-password-input {
+      width: 100%;
+      padding-right: 2.5rem;
+    }
+    
+    .p-password-toggle {
+      right: 0.75rem;
+      color: var(--text-color-secondary);
+      
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+  
+  /* Estilos para el checkbox */
+  .p-checkbox {
+    .p-checkbox-box {
+      border-radius: 6px;
+      
+      &.p-highlight {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+      
+      &:not(.p-disabled).p-focus {
+        box-shadow: 0 0 0 0.2rem var(--primary-100);
+        border-color: var(--primary-color);
+      }
+    }
+  }
+  
+  /* Estilos para el botón */
+  .p-button {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.2s;
+    
+    &:enabled:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+    
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+  
+  /* Estilos para el input */
+  .p-inputtext {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s;
+    
+    &:enabled:hover {
+      border-color: var(--primary-300);
+    }
+    
+    &:enabled:focus {
+      box-shadow: 0 0 0 0.2rem var(--primary-100);
+      border-color: var(--primary-color);
+    }
+  }
+}
+
+/* Estilos específicos para el tema oscuro */
+:host-context(.dark-theme) {
+  .p-inputtext,
+  .p-password-input {
+    background-color: var(--surface-card);
+    border-color: var(--surface-border);
+    color: var(--text-color);
+    
+    &::placeholder {
+      color: var(--text-color-secondary);
+    }
+  }
+  
+  .p-checkbox {
+    .p-checkbox-box {
+      background-color: var(--surface-card);
+      border-color: var(--surface-border);
+      
+      &.p-highlight {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+    }
+  }
+}

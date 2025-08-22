@@ -1,0 +1,31 @@
+<!-- Layout para usuarios autenticados -->
+<ng-container *ngIf="isAuthenticated; else unauthenticated">
+  <div class="min-h-screen flex bg-[var(--background)] transition-colors duration-300">
+    <!-- Sidebar -->
+    <app-sidebar></app-sidebar>
+    
+    <!-- Main Content -->
+    <div class="main-content flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out ml-16 overflow-y-auto">
+      <!-- Header con títulos dinámicos -->
+      <app-header 
+        [pageTitle]="pageTitle()" 
+        [subtitle]="pageSubtitle()">
+      </app-header>
+      
+      <!-- Page Content -->
+      <main class="flex-1 p-2 bg-surface-50 dark:bg-surface-0">
+        <router-outlet></router-outlet>
+      </main>
+    </div>
+  </div>
+</ng-container>
+
+<!-- Layout para usuarios no autenticados -->
+<ng-template #unauthenticated>
+  <div class="min-h-screen bg-[var(--background)]">
+    <router-outlet></router-outlet>
+  </div>
+</ng-template>
+
+<!-- Toaster Notifications -->
+<ngx-sonner-toaster theme="dark" richColors position="top-right" />

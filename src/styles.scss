@@ -1,0 +1,135 @@
+/* Tailwind CSS */
+@use 'tailwindcss/base';
+@use 'tailwindcss/components';
+@use 'tailwindcss/utilities';
+
+/* Base styles */
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Theme variables */
+/* Light theme by default */
+:root {
+  /* Light theme colors */
+  --surface-0: #ffffff;
+  --surface-50: #f9fafb;
+  --surface-100: #f3f4f6;
+  --surface-200: #e5e7eb;
+  --surface-300: #d1d5db;
+  --surface-400: #9ca3af;
+  --surface-500: #6b7280;
+  --surface-600: #4b5563;
+  --surface-700: #374151;
+  --surface-800: #1f2937;
+  --surface-900: #111827;
+  --surface-950: #030712;
+  
+  /* Text colors */
+  --text-color: #1f2937;
+  --text-secondary: #4b5563;
+  
+  /* Background colors */
+  --background: #ffffff;
+  --background-secondary: #f3f4f6;
+}
+
+/* Dark theme */
+.dark {
+  /* Dark theme colors */
+  --surface-0: #09090b;
+  --surface-50: #18181B;
+  --surface-100: #2c2c2d;
+  --surface-200: #424243;
+  --surface-300: #5a5a5b;
+  --surface-400: #747474;
+  --surface-500: #8e8e8e;
+  --surface-600: #a9a9a9;
+  --surface-700: #c5c5c5;
+  --surface-800: #e2e2e2;
+  --surface-900: #f0f0f0;
+  
+  /* Text colors */
+  --text-color: #f9fafb;
+  --text-secondary: #cbd5e1;
+  
+  /* Background colors */
+  --background: #09090b;
+  --background-secondary: #1e293b;
+}
+
+/* Estilos de PrimeNG */
+@import 'primeicons/primeicons.css';
+
+/* Estilos base de la aplicación */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--background);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Asegurar que los contenedores de PrimeNG usen el tema correcto */
+.p-component,
+.p-component * {
+  box-sizing: border-box;
+}
+
+/* Reset y estilos base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--surface-ground);
+  color: var(--text-color);
+}
+
+/* Ajustes para la integración de PrimeNG con Tailwind */
+.p-component {
+  font-family: var(--font-family);
+}
+
+/* Asegurar que los inputs de PrimeNG tengan el mismo estilo que los de Tailwind */
+.p-inputtext {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #d1d5db;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.p-inputtext:enabled:hover {
+  border-color: #9ca3af;
+}
+
+.p-inputtext:enabled:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+/* Estilos para el tema oscuro */
+.dark .p-inputtext {
+  background-color: #1f2937;
+  border-color: #4b5563;
+  color: #f3f4f6;
+}
+
+.dark .p-inputtext:enabled:hover {
+  border-color: #6b7280;
+}
+
+.dark .p-inputtext:enabled:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}

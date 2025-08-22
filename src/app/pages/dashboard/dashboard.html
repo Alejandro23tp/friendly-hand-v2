@@ -1,0 +1,707 @@
+<div class="bg-surface-0 dark:bg-surface-0 px-6 md:px-12 lg:px-20 font-display">
+
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex justify-center items-center p-8">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <!-- Active Cycle Card -->
+  <div class="mb-8">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+      <h2 class="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-900">Ciclo Anual</h2>
+      <div class="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
+        <button *ngIf="isAdmin" pButton pRipple 
+                icon="pi pi-plus"
+                label="Nuevo Ciclo"
+                class="p-button-sm w-full sm:w-auto"
+                (click)="showNewCycleDialog = true">
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Active Cycle -->
+      <div class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow-lg overflow-hidden border border-surface-200 dark:border-surface-700 transition-colors duration-300">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800">
+              {{ activeCycle ? 'Ciclo Activo' : 'Sin ciclo activo' }}
+            </h3>
+            <span *ngIf="activeCycle" class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800/50">
+              Activo
+            </span>
+          </div>
+          
+          <div *ngIf="activeCycle; else noActiveCycle" class="space-y-3">
+            <div class="flex items-center space-x-3">
+              <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">{{ activeCycle.year }}</p>
+              <p class="text-sm text-surface-600 dark:text-surface-400">
+                Iniciado el {{ formatDate(activeCycle.createdAt) }}
+              </p>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-surface-200 dark:border-surface-0 space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Fondos Totales</p>
+                  <p class="text-lg font-semibold text-primary-600 dark:text-primary-400">{{ formatCurrency(activeCycle.totalFunds || 0) }}</p>
+                </div>
+                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés Total</p>
+                  <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ formatCurrency(activeCycle.totalInterest || 0) }}</p>
+                </div>
+                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés Proyectado</p>
+                  <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ formatCurrency(activeCycle.projectedInterest || 0) }}</p>
+                </div>
+                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Total de Acciones</p>
+                  <p class="text-lg font-semibold text-purple-600 dark:text-purple-400">{{ activeCycle.totalShares || 0 }}</p>
+                </div>
+                <div class="col-span-2 bg-white dark:bg-surface-100 p-4 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés por Acción</p>
+                  <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ (activeCycle.interestPerShare || 0) | number:'1.2-2' }}</p>
+                </div>
+              </div>
+            </div>
+            <div class="mt-4 flex justify-end">
+              <button *ngIf="isAdmin" 
+                      pButton pRipple 
+                      label="Cerrar Ciclo" 
+                      icon="pi pi-lock"
+                      class="p-button-sm p-button-danger"
+                      (click)="closeCurrentCycle()"></button>
+            </div>
+          </div>
+          
+          <ng-template #noActiveCycle>
+            <p class="text-surface-600 dark:text-surface-700 mb-4">
+              No hay un ciclo anual activo actualmente. Crea un nuevo ciclo para comenzar.
+            </p>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Recent Cycles -->
+      <div class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow-lg overflow-hidden border border-surface-200 dark:border-surface-700 transition-colors duration-300">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Ciclos Anteriores</h3>
+          
+          <div *ngIf="allCycles.length > 0; else noCycles">
+            <div class="space-y-3">
+              <div *ngFor="let cycle of allCycles" class="bg-white dark:bg-surface-100 p-4 rounded-lg border border-surface-100 dark:border-surface-200 hover:shadow transition-shadow">
+                <div class="flex justify-between items-center">
+                  <div class="space-y-1">
+                    <p class="font-medium text-surface-900 dark:text-surface-900">{{ cycle.year }}</p>
+                    <p class="text-sm text-surface-600 dark:text-surface-500">
+                      {{ cycle.status === 'closed' ? 'Cerrado' : 'Activo' }} • 
+                      {{ formatDate(cycle.closedAt || cycle.createdAt) }}
+                    </p>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <span class="px-2 py-1 rounded-full text-xs font-medium" 
+                          [ngClass]="{
+                            'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800/50': cycle.status === 'active',
+                            'bg-surface-100 dark:bg-surface-200 text-surface-800 border border-surface-200 dark:border-surface-300': cycle.status === 'closed'
+                          }">
+                      {{ cycle.status === 'active' ? 'Activo' : 'Cerrado' }}
+                    </span>
+                    <span class="text-base font-semibold" 
+                          [ngClass]="{
+                            'text-primary-600 dark:text-primary-500': cycle.status === 'active',
+                            'text-surface-600 dark:text-surface-500': cycle.status === 'closed'
+                          }">
+                      {{ formatCurrency(cycle.totalFunds || 0) }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ng-template #noCycles>
+            <div class="bg-white dark:bg-surface-100 p-6 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-300 text-center">
+              <p class="text-surface-500 dark:text-surface-500">
+                No hay ciclos registrados
+              </p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loans Section -->
+  <div class="mb-8">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
+      <h2 class="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-900">Préstamos</h2>
+      <button *ngIf="isAdmin" 
+              pButton pRipple 
+              icon="pi pi-plus"
+              label="Nuevo Préstamo"
+              class="p-button-sm w-full sm:w-auto"
+              (click)="showNewLoanDialog = true">
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6">
+      <!-- My Loans -->
+      <div *ngIf="!isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Mis Préstamos</h3>
+          
+          <p-table *ngIf="myLoans.length > 0; else noLoans" 
+                  [value]="myLoans" 
+                  [scrollable]="true"
+                  scrollHeight="400px"
+                  [scrollable]="true"
+                  [rows]="10" 
+                  [paginator]="true"
+                  [showCurrentPageReport]="true"
+                  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} préstamos"
+                  [rowsPerPageOptions]="[5,10,25,50]"
+                  [class]="isDark ? 'dark' : 'light'"
+                  styleClass="p-datatable-gridlines p-datatable-striped">
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-left">Monto</th>
+                <th class="text-center">Tasa de Interés</th>
+                <th class="text-right">Interés Total</th>
+                <th class="text-center">Estado</th>
+                <th class="text-right">Vencimiento</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-loan>
+              <tr>
+                <td class="amount-cell">{{ formatCurrency(loan.amount) }}</td>
+                <td class="text-center interest-cell">{{ (loan.interestRate * 100) | number:'1.0-2' }}%</td>
+                <td class="text-right amount-cell">{{ formatCurrency(loan.totalInterest) }}</td>
+                <td class="text-center">
+                  <span class="status-badge" 
+                        [class.status-active]="loan.status === 'active'"
+                        [class.status-paid]="loan.status === 'paid'"
+                        [class.status-defaulted]="loan.status === 'defaulted'"
+                        [class.status-pending]="loan.status === 'pending' || loan.status === 'deferred'">
+                    <i class="pi" [ngClass]="{
+                      'pi-check-circle': loan.status === 'paid',
+                      'pi-clock': loan.status === 'pending' || loan.status === 'deferred',
+                      'pi-exclamation-circle': loan.status === 'defaulted',
+                      'pi-sync': loan.status === 'active'
+                    }"></i>
+                    <span class="ml-2">{{ getLoanStatusText(loan.status) }}</span>
+                  </span>
+                </td>
+                <td class="text-right date-cell">
+                  {{ formatDate(loan.dueDate) }}
+                  <div class="text-xs text-surface-500">
+                    {{ getDaysUntilDue(loan.dueDate) }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <button pButton pRipple icon="pi pi-eye" 
+                          class="p-button-rounded p-button-text p-button-sm"
+                          pTooltip="Ver detalles"
+                          tooltipPosition="top"
+                          (click)="viewLoanPayments(loan)"></button>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+          
+          <ng-template #noLoans>
+            <p class="text-surface-600 dark:text-surface-700 text-center py-4">
+              No tienes préstamos registrados
+            </p>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Active Loans (Admin Only) -->
+      <div *ngIf="isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800">Préstamos Activos</h3>
+            <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              {{ activeLoans.length }} {{ activeLoans.length === 1 ? 'préstamo' : 'préstamos' }}
+            </span>
+          </div>
+          
+          <p-table *ngIf="activeLoans.length > 0; else noActiveLoans" 
+                  [value]="activeLoans"
+                  [scrollable]="true"
+                  scrollHeight="500px"
+                  [rows]="5"
+                  [paginator]="true"
+                  [showCurrentPageReport]="true"
+                  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} préstamos"
+                  
+                  [class]="isDark ? 'dark' : 'light'"
+                  styleClass="p-datatable-gridlines p-datatable-striped">
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-left">Participante</th>
+                <th class="text-right">Monto</th>
+                <th class="text-center">Tasa</th>
+                <th class="text-right">Interés Total</th>
+                <th class="text-center">Estado</th>
+                <th class="text-right">Vencimiento</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-loan>
+              <tr>
+                <td class="font-medium">
+                  <div class="flex items-center">
+                    <p-avatar [label]="getParticipantInitials(loan.participantId)" 
+                             styleClass="mr-3" 
+                             [style]="{'background-color': getRandomColor(loan.participantId), 'color': '#fff'}"
+                             shape="circle"
+                             size="normal"></p-avatar>
+                    <div>
+                      <div class="font-semibold">{{ getParticipantName(loan.participantId) }}</div>
+                      <div class="text-xs text-surface-500">ID: {{ loan.participantId }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="amount-cell">{{ formatCurrency(loan.amount) }}</td>
+                <td class="text-center interest-cell">{{ (loan.interestRate * 100) | number:'1.0-2' }}%</td>
+                <td class="text-right amount-cell">{{ formatCurrency(loan.totalInterest) }}</td>
+                <td class="text-center">
+                  <span class="status-badge" 
+                        [class.status-active]="loan.status === 'active'"
+                        [class.status-paid]="loan.status === 'paid'"
+                        [class.status-defaulted]="loan.status === 'defaulted'"
+                        [class.status-pending]="loan.status === 'pending' || loan.status === 'deferred'">
+                    <i class="pi" [ngClass]="{
+                      'pi-check-circle': loan.status === 'paid',
+                      'pi-clock': loan.status === 'pending' || loan.status === 'deferred',
+                      'pi-exclamation-circle': loan.status === 'defaulted',
+                      'pi-sync': loan.status === 'active'
+                    }"></i>
+                    <span class="ml-2">{{ getLoanStatusText(loan.status) }}</span>
+                  </span>
+                </td>
+                <td class="text-right date-cell">
+                  {{ formatDate(loan.dueDate) }}
+                  <div class="text-xs" [ngClass]="{
+                    'text-green-500': getDaysUntilDueClass(loan.dueDate) === 'success',
+                    'text-yellow-500': getDaysUntilDueClass(loan.dueDate) === 'warning',
+                    'text-red-500': getDaysUntilDueClass(loan.dueDate) === 'danger'
+                  }">
+                    {{ getDaysUntilDue(loan.dueDate) }}
+                  </div>
+                </td>
+                <td class="text-center">
+                  <button pButton pRipple icon="pi pi-eye" 
+                          class="p-button-rounded p-button-text p-button-sm"
+                          pTooltip="Ver detalles"
+                          tooltipPosition="top"
+                          (click)="viewLoanPayments(loan)"></button>
+                  <button *ngIf="loan.status === 'active' || loan.status === 'deferred'"
+                          pButton pRipple icon="pi pi-money-bill" 
+                          class="p-button-rounded p-button-text p-button-sm p-button-success"
+                          pTooltip="Registrar pago"
+                          tooltipPosition="top"
+                          (click)="openPaymentDialog(loan)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="text-center p-4">
+                  <i class="pi pi-inbox text-4xl text-surface-400 mb-2"></i>
+                  <p class="text-surface-600">No se encontraron préstamos activos</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+          
+          <ng-template #noActiveLoans>
+            <div class="bg-white dark:bg-surface-100 p-8 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-300 text-center">
+              <i class="pi pi-inbox text-4xl text-surface-400 mb-4"></i>
+              <p class="text-surface-600 dark:text-surface-500 mb-4">
+                No hay préstamos activos en este momento
+              </p>
+              <button pButton pRipple 
+                      icon="pi pi-plus"
+                      label="Crear Préstamo"
+                      class="p-button-sm"
+                      (click)="showNewLoanDialog = true"></button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <!-- Completed Loans (Admin Only) -->
+      <div *ngIf="isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden mt-6">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800">Préstamos Completados</h3>
+            <span class="text-primary-600 dark:text-primary-400 text-xs font-medium px-2.5 py-0.5 rounded-full">
+              {{ completedLoans.length }} {{ completedLoans.length === 1 ? 'préstamo' : 'préstamos' }}
+            </span>
+          </div>
+          
+          <p-table *ngIf="completedLoans.length > 0; else noCompletedLoans" 
+                  [value]="completedLoans"
+                  [scrollable]="true"
+                  scrollHeight="500px"
+                  [rows]="5"
+                  [paginator]="true"
+                  [showCurrentPageReport]="true"
+                  currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} préstamos"
+                  [class]="isDark ? 'dark' : 'light'"
+                  styleClass="p-datatable-gridlines p-datatable-striped">
+            <ng-template pTemplate="header">
+              <tr>
+                <th class="text-left">Participante</th>
+                <th class="text-right">Monto</th>
+                <th class="text-center">Tasa</th>
+                <th class="text-right">Interés Total</th>
+                <th class="text-center">Estado</th>
+                <th class="text-right">Pagado el</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-loan>
+              <tr>
+                <td class="font-medium">
+                  <div class="flex items-center">
+                    <p-avatar [label]="getParticipantInitials(loan.participantId)" 
+                             styleClass="mr-3" 
+                             [style]="{'background-color': getRandomColor(loan.participantId), 'color': '#fff'}"
+                             shape="circle"
+                             size="normal"></p-avatar>
+                    <div>
+                      <div class="font-semibold">{{ getParticipantName(loan.participantId) }}</div>
+                      <div class="text-xs text-surface-500">ID: {{ loan.participantId }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="amount-cell">{{ formatCurrency(loan.amount) }}</td>
+                <td class="text-center interest-cell">{{ (loan.interestRate * 100) | number:'1.0-2' }}%</td>
+                <td class="text-right amount-cell">{{ formatCurrency(loan.totalInterest) }}</td>
+                <td class="text-center">
+                  <span class="status-badge status-paid">
+                    <i class="pi pi-check-circle"></i>
+                    <span class="ml-2">Pagado</span>
+                  </span>
+                </td>
+                <td class="text-right date-cell">
+                  {{ formatDate(loan.paidAt) }}
+                </td>
+                <td class="text-center">
+                  <button pButton pRipple icon="pi pi-eye" 
+                          class="p-button-rounded p-button-text p-button-sm"
+                          pTooltip="Ver detalles"
+                          tooltipPosition="top"
+                          (click)="viewLoanPayments(loan)"></button>
+                </td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="7" class="text-center p-4">
+                  <i class="pi pi-inbox text-4xl text-surface-400 mb-2"></i>
+                  <p class="text-surface-600">No se encontraron préstamos completados</p>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+          
+          <ng-template #noCompletedLoans>
+            <div class="bg-white dark:bg-surface-100 p-8 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-300 text-center">
+              <i class="pi pi-inbox text-4xl text-surface-400 mb-4"></i>
+              <p class="text-surface-600 dark:text-surface-500 mb-4">
+                No hay préstamos completados
+              </p>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Cycle Dialog -->
+  <p-dialog header="Nuevo Ciclo Anual" 
+           [(visible)]="showNewCycleDialog" 
+           [modal]="true" 
+           [style]="{width: '450px'}"
+           [draggable]="false" 
+           [resizable]="false">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="year">Año</label>
+        <input id="year" type="number" pInputText [(ngModel)]="newCycleYear" min="2023" max="2050" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton pRipple 
+              label="Cancelar" 
+              icon="pi pi-times" 
+              class="p-button-text"
+              (click)="showNewCycleDialog = false"></button>
+      <button pButton pRipple 
+              label="Activar" 
+              icon="pi pi-check" 
+              class="p-button-success"
+              (click)="activateNewCycle()"
+              [loading]="loading"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- New Loan Dialog -->
+  <p-dialog header="Nuevo Préstamo" 
+           [(visible)]="showNewLoanDialog" 
+           [modal]="true" 
+           [style]="{width: '450px'}"
+           [draggable]="false" 
+           [resizable]="false">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="participant">Participante</label>
+        <p-select
+          [(ngModel)]="selectedParticipant"
+          [options]="participants"
+          optionLabel="name"
+          placeholder="Selecciona un participante"
+          [filter]="true"
+          filterBy="name"
+          [loading]="loadingParticipants"
+          [ngClass]="{'p-inputtext-dark': isDark, 'p-inputtext-light': !isDark}"
+          [style]="isDark ? 
+            {'background-color': 'var(--surface-card)', 'border-color': 'var(--surface-border)'} : 
+            {}"
+          [panelStyle]="isDark ? 
+            {'background': 'var(--surface-overlay)', 'color': 'var(--text-color)'} : 
+            {}"
+          required>
+        </p-select>
+      </div>
+      <div class="field">
+        <label for="amount">Monto</label>
+        <span class="p-input-icon-right">
+          <i class="pi pi-dollar"></i>
+          <input id="amount" type="number" pInputText [(ngModel)]="newLoan.amount" required min="1" />
+        </span>
+      </div>
+      <div class="field">
+        <label for="year">Año del Préstamo</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-calendar"></i>
+          </span>
+          <input 
+            id="year"
+            type="text"
+            pInputText
+            [value]="activeCycle?.year"
+            readonly
+            class="w-full bg-surface-100 dark:bg-surface-300 text-surface-800 dark:text-surface-800"
+            style="cursor: not-allowed">
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <button pButton pRipple 
+              label="Cancelar" 
+              icon="pi pi-times" 
+              class="p-button-text"
+              (click)="showNewLoanDialog = false"></button>
+      <button pButton pRipple 
+              label="Crear" 
+              icon="pi pi-check" 
+              class="p-button-success"
+              (click)="createNewLoan()"
+              [loading]="loading"></button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Toast -->
+  <p-toast></p-toast>
+
+  <!-- Participant Dialog -->
+  <app-participant-dialog 
+    [(visible)]="showParticipantDialog"
+    [isAdmin]="isAdmin"
+    [loading]="loading"
+    (onSave)="saveParticipant($event)"
+    (onHide)="hideParticipantDialog()">
+  </app-participant-dialog>
+
+  <!-- Payment Dialog -->
+  <p-dialog header="Registrar Pago de Préstamo" [(visible)]="showPaymentDialog" [modal]="true" [style]="{width: '450px'}" [draggable]="false" [resizable]="false">
+    <form (ngSubmit)="onPaymentSubmit()" *ngIf="paymentData" class="p-fluid">
+      <div class="field">
+        <label for="amount">Monto del Pago</label>
+        <p-inputNumber 
+          id="amount" 
+          [ngModel]="paymentData.amount" 
+          (ngModelChange)="onAmountChange($event)"
+          name="amount" 
+          mode="currency" 
+          currency="MXN" 
+          locale="es-MX"
+          [min]="1"
+          [required]="true"
+          [readonly]="true"
+          inputStyle="{'background-color': '#f8f9fa', 'border': '1px solid #e9ecef'}"
+          class="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label class="block mb-2 font-medium">Tipo de Pago</label>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <button type="button" 
+                  [class]="'p-3 rounded-lg border transition-colors ' + 
+                         (paymentData.paymentType === 'full' ? 
+                          'bg-blue-500 text-white border-blue-500' : 
+                          'bg-white dark:bg-surface-50 border-surface-200 dark:border-surface-200 hover:bg-surface-100 dark:hover:bg-surface-200')"
+                  (click)="onPaymentTypeChange('full')">
+            <i class="pi pi-check-circle mr-2"></i>
+            <span>Pago Completo</span>
+            <div class="text-xs opacity-80 mt-1">Capital + Interés</div>
+          </button>
+          
+          <button type="button"
+                  [class]="'p-3 rounded-lg border transition-colors ' + 
+                         (paymentData.paymentType === 'principal' ? 
+                          'bg-green-500 text-white border-green-500' : 
+                          'bg-white dark:bg-surface-50 border-surface-200 dark:border-surface-200 hover:bg-surface-100 dark:hover:bg-surface-200')"
+                  (click)="onPaymentTypeChange('principal')">
+            <i class="pi pi-arrow-up-right mr-2"></i>
+            <span>Solo Capital</span>
+            <div class="text-xs opacity-80 mt-1">Sin interés</div>
+          </button>
+          
+          <button type="button"
+                  [class]="'p-3 rounded-lg border transition-colors ' + 
+                         (paymentData.paymentType === 'interest' ? 
+                          'bg-amber-500 text-white border-amber-500' : 
+                          'bg-white dark:bg-surface-50 border-surface-200 dark:border-surface-200 hover:bg-surface-100 dark:hover:bg-surface-200')"
+                  (click)="onPaymentTypeChange('interest')">
+            <i class="pi pi-percentage mr-2"></i>
+            <span>Solo Interés</span>
+            <div class="text-xs opacity-80 mt-1">Sin capital</div>
+          </button>
+        </div>
+        <input type="hidden" name="paymentType" [ngModel]="paymentData.paymentType" required>
+      </div>
+
+      <div class="field">
+        <label for="year">Año</label>
+        <p-inputNumber 
+          id="year" 
+          [(ngModel)]="paymentData.year" 
+          name="year" 
+          [min]="2000"
+          [max]="2100"
+          [required]="true"
+          class="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="weekNumber">Número de Semana</label>
+        <p-inputNumber 
+          id="weekNumber" 
+          [(ngModel)]="paymentData.weekNumber" 
+          name="weekNumber" 
+          [min]="1"
+          [max]="52"
+          [required]="true"
+          class="w-full">
+        </p-inputNumber>
+      </div>
+
+      <div class="flex justify-end gap-3 mt-6">
+        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-sm" (click)="showPaymentDialog = false" [disabled]="loading"></button>
+        <button pButton pRipple type="submit" label="Registrar Pago" icon="pi pi-check" class="p-button-success p-button-sm" [loading]="loading"></button>
+      </div>
+    </form>
+  </p-dialog>
+
+  <!-- Loan Payments Dialog -->
+  <p-dialog header="Detalles del Préstamo" 
+            [(visible)]="showLoanPaymentsDialog" 
+            [modal]="true" 
+            [style]="{ width: '90vw', maxWidth: '800px' }"
+            [contentStyle]="{'max-height': '70vh'}"
+            [baseZIndex]="10000">
+    <div *ngIf="selectedLoan" class="space-y-4">
+      <div class="bg-surface-50 dark:bg-surface-50 p-4 rounded-lg mb-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Participante</p>
+            <p class="font-medium">{{ getParticipantName(selectedLoan.participantId) }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Monto del Préstamo</p>
+            <p class="font-medium">{{ formatCurrency(selectedLoan.amount) }}</p>
+          </div>
+          <div>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Tasa de Interés</p>
+            <p class="font-medium">{{ (selectedLoan.interestRate * 100) | number:'1.0-2' }}%</p>
+          </div>
+          <div>
+            <p class="text-sm text-surface-500 dark:text-surface-400">Interés Total</p>
+            <p class="font-medium">{{ formatCurrency(selectedLoan.totalInterest) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-semibold">Historial de Pagos</h3>
+      
+      <p-table *ngIf="loanPayments.length > 0; else noPayments" 
+              [value]="loanPayments" 
+              [scrollable]="true"
+              scrollHeight="300px"
+              [class]="isDark ? 'dark' : 'light'"
+              styleClass="p-datatable-gridlines">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-left">Fecha</th>
+            <th class="text-right">Monto</th>
+            <th class="text-center">Tipo</th>
+            <th class="text-center">Semana</th>
+            <th class="text-center">Año</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-payment>
+          <tr>
+            <td class="text-left">{{ formatDate(payment.createdAt) }}</td>
+            <td class="text-right">{{ formatCurrency(payment.amount) }}</td>
+            <td class="text-center">
+              <span class="status-badge" 
+                    [class.status-paid]="payment.paymentType === 'full' || payment.paymentType === 'principal'"
+                    [class.status-pending]="payment.paymentType === 'interest'">
+                {{ getPaymentTypeText(payment.paymentType) }}
+              </span>
+            </td>
+            <td class="text-center">{{ payment.weekNumber }}</td>
+            <td class="text-center">{{ payment.year }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      
+      <ng-template #noPayments>
+        <div class="bg-surface-50 dark:bg-surface-50 p-6 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-600 text-center">
+          <p class="text-surface-500 dark:text-surface-400">
+            No hay pagos registrados para este préstamo
+          </p>
+        </div>
+      </ng-template>
+    </div>
+    
+    <ng-template pTemplate="footer">
+      <button pButton 
+              pRipple 
+              label="Cerrar" 
+              class="p-button-text"
+              (click)="showLoanPaymentsDialog = false"></button>
+    </ng-template>
+  </p-dialog>
+</div>

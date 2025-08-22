@@ -1,0 +1,123 @@
+<div class="bg-surface-0 dark:bg-surface-0 px-6 md:px-12 lg:px-20 font-display">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+    <h1 class="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-900">
+      <span class="text-primary-600 dark:text-primary-400">{{participantes.length}}</span> Participantes 
+    </h1>
+    <button *ngIf="isAdmin" 
+            pButton pRipple 
+            icon="pi pi-plus" 
+            label="Nuevo Participante"
+            class="p-button-sm w-full sm:w-auto"
+            (click)="openNew()">
+    </button>
+  </div>
+
+  <!-- Pestañas de filtrado -->
+  <div class="mb-8">
+    <div class="flex items-center bg-surface-100 dark:bg-surface-100 p-1 rounded-lg w-fit mx-auto">
+      <button 
+        (click)="activeTab = 'active'; onTabChange()"
+        [ngClass]="{
+          'bg-white dark:bg-green-900 shadow-md text-primary-600 dark:text-primary-400': activeTab === 'active',
+          'text-gray-600 dark:text-gray-300 hover:bg-surface-200 dark:hover:bg-surface-300': activeTab !== 'active'
+        }"
+        class="px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" 
+        type="button">
+        Activos
+      </button>
+      <button 
+        (click)="activeTab = 'inactive'; onTabChange()"
+        [ngClass]="{
+          'bg-white dark:bg-red-900 shadow-md text-primary-600 dark:text-primary-400': activeTab === 'inactive',
+          'text-gray-600 dark:text-gray-300 hover:bg-surface-200 dark:hover:bg-surface-300': activeTab !== 'inactive'
+        }"
+        class="px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" 
+        type="button">
+        Inactivos
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="flex justify-center items-center p-8">
+    <p-progressSpinner></p-progressSpinner>
+  </div>
+
+  <div *ngIf="!loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div *ngFor="let participante of participantes" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden">
+      <div class="p-6">
+        <div class="flex items-center gap-4">
+          <img [src]="getGenderImage(participante.name)" 
+               [alt]="participante.name" 
+               class="w-20 h-20 rounded-full object-cover" />
+          <div class="min-w-0 flex-1">
+            <div class="w-full">
+              <div class="flex justify-between items-start">
+                <h3 class="text-base sm:text-lg font-semibold text-surface-900 dark:text-surface-800 truncate font-display">{{ participante.name }}</h3>
+                <span class="text-xs text-gray-500 dark:text-gray-400">ID: {{ participante.id }}</span>
+              </div>
+              <p class="text-sm sm:text-base text-surface-600 dark:text-surface-700 truncate font-display" [title]="participante.email">
+                {{ participante.email }}
+              </p>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
+                  {{ participante.shares || 0 }} acciones
+                </span>
+                <span *ngIf="participante.isNew" class="text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                  Nuevo
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-4 flex justify-between items-center">
+          <span class="px-3 py-1 rounded-full text-sm font-medium font-display"
+                [ngClass]="{
+                  'bg-green-100 text-green-800': participante.isActive,
+                  'bg-red-100 text-red-800': !participante.isActive
+                }">
+            {{ participante.isActive ? 'Activo' : 'Inactivo' }}
+          </span>
+          
+          <div class="flex gap-2" *ngIf="isAdmin">
+            <button pButton pRipple 
+                    icon="pi pi-pencil" 
+                    class="p-button-rounded p-button-text p-button-sm"
+                    (click)="editParticipante(participante)"></button>
+            <button pButton pRipple 
+                    [icon]="participante.isActive ? 'pi pi-lock' : 'pi pi-lock-open'"
+                    [pTooltip]="participante.isActive ? 'Desactivar' : 'Activar'"
+                    tooltipPosition="top"
+                    class="p-button-rounded p-button-text p-button-sm"
+                    [ngClass]="{
+                      'p-button-warning': participante.isActive,
+                      'p-button-success': !participante.isActive
+                    }"
+                    (click)="toggleStatus(participante)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shared Participant Dialog Component -->
+  <app-participant-dialog
+    [visible]="displayDialog"
+    [editMode]="editMode"
+    [isAdmin]="isAdmin"
+    [loading]="loading"
+    [participant]="selectedParticipant"
+    (visibleChange)="onDialogVisibilityChange($event)"
+    (onSave)="handleSave($event)"
+    (onHide)="onHideDialog()">
+  </app-participant-dialog>
+
+  <!-- Diálogo de confirmación -->
+  <app-confirm-dialog
+    [(visible)]="showConfirmDialog"
+    [message]="confirmMessage"
+    [loading]="loading"
+    (onHide)="onConfirmDialogHide()"
+    (onConfirm)="confirmAction()">
+  </app-confirm-dialog>
+</div>
