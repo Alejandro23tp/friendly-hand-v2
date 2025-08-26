@@ -348,7 +348,8 @@
               icon="pi pi-calendar-plus" 
               label="Generar Pagos Semanales"
               class="p-button-success"
-              (click)="confirmWeeklyPayments()">
+              (click)="bulkPayAllParticipants()"
+              [disabled]="loading">
       </button>
     </div>
   </div>

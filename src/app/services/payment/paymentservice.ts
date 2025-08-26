@@ -67,33 +67,41 @@ export class PaymentService {
   }
 
   /**
-   * Create weekly payments for all active participants (admin only)
-   * @param weeklyPaymentsData Weekly payments data
-   * @returns Result of the operation
+   * Pay all active participants for a specific week
+   * @param year Year of the cycle
+   * @param weekNumber Week number (optional, defaults to current week)
+   * @param excludeIds Array of participant IDs to exclude (optional)
+   * @returns Result of the bulk payment operation
    */
-  createWeeklyPayments(weeklyPaymentsData: CreateWeeklyPaymentsDto): Observable<{
+  bulkPayAllParticipants(year: number, weekNumber?: number, excludeIds: number[] = []): Observable<{
+    message: string;
+    year: number;
+    weekNumber: number;
+    currentWeekCalculated: number;
     totalParticipants: number;
     paymentsCreated: number;
     paymentsSkipped: number;
-    details: Array<{
-      participantId: number;
-      name: string;
-      status: 'created' | 'skipped';
-      amount: number;
-      reason?: string;
-    }>;
+    details: any[];
   }> {
-    return this.http.post<{
+    let params: any = { year };
+    
+    if (weekNumber) {
+      params.weekNumber = weekNumber;
+    }
+    
+    if (excludeIds.length > 0) {
+      params.excludeIds = excludeIds.join(',');
+    }
+    
+    return this.http.get<{
+      message: string;
+      year: number;
+      weekNumber: number;
+      currentWeekCalculated: number;
       totalParticipants: number;
       paymentsCreated: number;
       paymentsSkipped: number;
-      details: Array<{
-        participantId: number;
-        name: string;
-        status: 'created' | 'skipped';
-        amount: number;
-        reason?: string;
-      }>;
-    }>(`${this.apiUrl}/weekly`, weeklyPaymentsData);
+      details: any[];
+    }>(`${this.apiUrl}/bulk-pay`, { params });
   }
 }

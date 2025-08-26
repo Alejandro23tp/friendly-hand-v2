@@ -415,25 +415,44 @@ export class PaymentComponent implements OnInit {
     });
   }
   
-  confirmWeeklyPayments() {
-    this.confirmationService.confirm({
-      message: '¿Está seguro de crear pagos semanales para todos los participantes activos?',
-      header: 'Confirmar',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí',
-      rejectLabel: 'No',
-      accept: () => {
-        this.paymentService.createWeeklyPayments(this.weeklyPayments).subscribe({
-          next: (result: any) => {
-            this.notificationService.success(`Pagos semanales creados: ${result.paymentsCreated} pagos generados, ${result.paymentsSkipped} omitidos`);
-            this.loadCyclePayments();
-            this.loadMyPayments();
-          },
-          error: (error) => {
-            console.error('Error creating weekly payments:', error);
-            this.notificationService.error(`Error al crear pagos semanales: ${error.error?.message || error.message}`);
-          }
-        });
+  bulkPayAllParticipants() {
+    if (!this.weeklyPayments.year) {
+      this.notificationService.error('Por favor seleccione un año');
+      return;
+    }
+
+    this.loading = true;
+    
+    this.paymentService.bulkPayAllParticipants(
+      this.weeklyPayments.year,
+      this.weeklyPayments.weekNumber,
+      this.weeklyPayments.excludeParticipantIds || []
+    ).subscribe({
+      next: (result) => {
+        // Show detailed success message
+        const successMessage = `Pagos procesados para la semana ${result.weekNumber} del año ${result.year}. ` +
+                             `Total participantes: ${result.totalParticipants}, ` +
+                             `Pagos creados: ${result.paymentsCreated}, ` +
+                             `Pagos omitidos: ${result.paymentsSkipped}`;
+        
+        this.notificationService.success(successMessage);
+        
+        // Reset the form
+        this.weeklyPayments = {
+          year: new Date().getFullYear(),
+          weekNumber: this.getCurrentWeekNumber(),
+          excludeParticipantIds: []
+        };
+        
+        this.loading = false;
+        
+        // Reload cycle payments to show the new ones
+        this.loadCyclePayments();
+      },
+      error: (error) => {
+        console.error('Error procesando pagos masivos:', error);
+        this.notificationService.error(error.error?.message || 'Error al procesar los pagos masivos');
+        this.loading = false;
       }
     });
   }
