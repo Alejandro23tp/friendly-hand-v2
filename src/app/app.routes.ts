@@ -5,6 +5,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { Participantes } from './pages/participantes/participantes';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthService } from './services/auth/authservice';
+import { PaymentComponent } from './pages/payment/payment';
 
 export const routes: Routes = [
   {
@@ -32,6 +33,12 @@ export const routes: Routes = [
     path: 'participantes',
     component: Participantes,
     title: 'Participantes',
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'payment',
+    component: PaymentComponent,
+    title: 'Pagos',
     canActivate: [AuthGuard]
   },
   {

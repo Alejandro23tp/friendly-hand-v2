@@ -41,72 +41,7 @@
 
 // PrimeNG Select Component Theming
 :host ::ng-deep {
-  // Root element styles
-  .p-select {
-    // Light theme colors
-    --p-select-background: #ffffff;
-    --p-select-border-color: #ced4da;
-    --p-select-color: #212529;
-    --p-select-hover-border-color: #80bdff;
-    --p-select-focus-border-color: #4d94ff;
-    --p-select-focus-ring-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    --p-select-placeholder-color: #6c757d;
-    --p-select-clear-icon-color: #6c757d;
-    --p-select-dropdown-color: #6c757d;
-    --p-select-overlay-background: #ffffff;
-    --p-select-overlay-border-color: rgba(0, 0, 0, 0.15);
-    --p-select-option-color: #212529;
-    --p-select-option-focus-background: #f8f9fa;
-    --p-select-option-focus-color: #212529;
-    --p-select-option-selected-background: #e7f1ff;
-    --p-select-option-selected-color: #0d6efd;
-    --p-select-option-selected-focus-background: #d7e5ff;
-    --p-select-checkmark-color: #0d6efd;
-    --p-select-option-hover-bg: #f1f3f5;
-    --p-select-option-selected-hover-bg: #e1ebff;
-    width: 100%;
-    background: var(--p-select-background, #ffffff);
-    border: 1px solid var(--p-select-border-color, #ced4da);
-    border-radius: var(--p-select-border-radius, 6px);
-    transition: border-color var(--p-select-transition-duration, 0.2s) ease-in-out, 
-                box-shadow var(--p-select-transition-duration, 0.2s) ease-in-out;
-    
-    // Hover state
-    &:not(.p-disabled):hover {
-      border-color: var(--p-select-hover-border-color);
-      background: var(--p-select-hover-bg, #f8f9fa);
-    }
-    
-    // Focus state
-    &:focus, &.p-focus {
-      border-color: var(--p-select-focus-border-color, #80bdff);
-      box-shadow: 0 0 0 0.2rem var(--p-select-focus-ring-shadow, rgba(0, 123, 255, 0.25));
-    }
-    
-    // Label and placeholder
-    .p-select-label {
-      color: var(--p-select-color, #495057);
-      padding: var(--p-select-padding-y, 0.5rem) var(--p-select-padding-x, 0.75rem);
-      
-      &.p-placeholder {
-        color: var(--p-select-placeholder-color, #6c757d);
-      }
-    }
-    
-    // Icons
-    .p-select-clear-icon {
-      color: var(--p-select-clear-icon-color, #6c757d);
-      
-      &:hover {
-        color: var(--p-select-clear-icon-hover-color, #495057);
-      }
-    }
-    
-    .p-select-dropdown-icon {
-      color: var(--p-select-dropdown-color, #6c757d);
-    }
-  }
-  
+
   // Dropdown panel - Light theme by default
   .p-select-overlay {
     background: var(--p-select-overlay-background, #ffffff) !important;

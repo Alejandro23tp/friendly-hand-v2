@@ -1,1 +1,355 @@
-<p>payment works!</p>
+<div class="bg-surface-0 dark:bg-surface-0 px-6 md:px-12 lg:px-20 font-display">
+  <!-- Header with Tabs -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+    <h1 class="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-900">
+      <span class="text-primary-600 dark:text-primary-400">Gestión de Pagos</span>
+    </h1>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="mb-8 px-2">
+    <div class="bg-surface-50 dark:bg-surface-50 p-1.5 rounded-lg shadow-sm w-full max-w-4xl mx-auto">
+      <div class="flex flex-wrap justify-center gap-1 sm:gap-2">
+        <!-- Mis Pagos - Only for non-admin -->
+        <button *ngIf="!isAdmin"
+          (click)="setActiveTab('myPayments')"
+          [ngClass]="{
+            'bg-white dark:bg-surface-0 text-primary-600 dark:text-primary-400 shadow-sm': activeTab === 'myPayments',
+            'bg-surface-50 dark:bg-surface-50 text-gray-600 dark:text-gray-300 hover:bg-surface-100 dark:hover:bg-surface-100': activeTab !== 'myPayments'
+          }"
+          class="flex-1 sm:flex-none px-3 sm:px-5 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50 dark:focus:ring-offset-surface-800 flex items-center justify-center min-w-[120px]" 
+          type="button">
+          <i class="pi pi-wallet mr-2 text-sm"></i>
+          <span class="whitespace-nowrap">Mis Pagos</span>
+        </button>
+        
+        <!-- Admin Tabs -->
+        <ng-container *ngIf="isAdmin">
+          <!-- Registrar Pago -->
+          <button
+            (click)="setActiveTab('createPayment')"
+            [ngClass]="{
+              'bg-white dark:bg-surface-0 text-primary-600 dark:text-primary-400 shadow-sm': activeTab === 'createPayment',
+              'bg-surface-50 dark:bg-surface-50 text-gray-600 dark:text-gray-300 hover:bg-surface-100 dark:hover:bg-surface-100': activeTab !== 'createPayment'
+            }"
+            class="flex-1 sm:flex-none px-3 sm:px-5 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50 dark:focus:ring-offset-surface-800 flex items-center justify-center min-w-[140px]" 
+            type="button">
+            <i class="pi pi-plus-circle mr-2 text-sm"></i>
+            <span class="whitespace-nowrap">Registrar Pago</span>
+          </button>
+          
+          <!-- Pagos del Ciclo -->
+          <button
+            (click)="setActiveTab('cyclePayments')"
+            [ngClass]="{
+              'bg-white dark:bg-surface-0 text-primary-600 dark:text-primary-400 shadow-sm': activeTab === 'cyclePayments',
+              'bg-surface-50 dark:bg-surface-50 text-gray-600 dark:text-gray-300 hover:bg-surface-100 dark:hover:bg-surface-100': activeTab !== 'cyclePayments'
+            }"
+            class="flex-1 sm:flex-none px-3 sm:px-5 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50 dark:focus:ring-offset-surface-800 flex items-center justify-center min-w-[150px]" 
+            type="button">
+            <i class="pi pi-calendar mr-2 text-sm"></i>
+            <span class="whitespace-nowrap">Pagos del Ciclo</span>
+          </button>
+          
+          <!-- Pagos Semanales -->
+          <button
+            (click)="setActiveTab('weeklyPayments')"
+            [ngClass]="{
+              'bg-white dark:bg-surface-0 text-primary-600 dark:text-primary-400 shadow-sm': activeTab === 'weeklyPayments',
+              'bg-surface-50 dark:bg-surface-50 text-gray-600 dark:text-gray-300 hover:bg-surface-100 dark:hover:bg-surface-100': activeTab !== 'weeklyPayments'
+            }"
+            class="flex-1 sm:flex-none px-3 sm:px-5 py-2.5 text-sm font-medium rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-surface-50 dark:focus:ring-offset-surface-800 flex items-center justify-center min-w-[150px]" 
+            type="button">
+            <i class="pi pi-clock mr-2 text-sm"></i>
+            <span class="whitespace-nowrap">Pagos Semanales</span>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Payments Tab -->
+  <div *ngIf="activeTab === 'myPayments'" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden p-6" >
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-900">Mis Pagos</h2>
+    </div>
+    
+    <div *ngIf="loadingPayments" class="flex justify-center items-center p-8">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+    
+    <div *ngIf="!loadingPayments && myPayments.length === 0" class="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+      <div class="p-6">
+        <i class="pi pi-inbox text-5xl text-gray-400 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No hay pagos registrados</h3>
+        <p class="text-gray-500 dark:text-gray-400">Aún no has realizado ningún pago.</p>
+      </div>
+    </div>
+    
+    <div *ngIf="!loadingPayments && myPayments.length > 0" class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+      <p-table [value]="myPayments" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,25,50]" 
+               [totalRecords]="myPayments.length" [loading]="loadingPayments" 
+               styleClass="p-datatable-sm p-datatable-gridlines" 
+               responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Fecha</th>
+            <th>Participante</th>
+            <th>Monto</th>
+            <th>Ciclo</th>
+            <th>Semana</th>
+            <th>Estado</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-payment>
+          <tr>
+            <td>{{ payment.paymentDate | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ payment.participantName }}</td>
+            <td [ngClass]="{'text-green-600 font-semibold': payment.amount > 0}">
+              {{ payment.amount | currency:'USD':'symbol':'1.2-2' }}
+            </td>
+            <td>{{ payment.cycleYear }}</td>
+            <td>Semana {{ payment.weekNumber }}</td>
+            <td>
+              <p-tag value="Completado" severity="success"></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Create Payment Form (Admin) -->
+  <div *ngIf="activeTab === 'createPayment' && isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden p-6">
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-900 mb-6">Registrar Nuevo Pago</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="field">
+        <label for="participantId" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Participante</label>
+        <p-select [options]="participantOptions" 
+                 [(ngModel)]="newPayment.participantId"
+                 name="participantId"
+                 optionLabel="label"
+                 [style]="{width: '100%'}"
+                 [filter]="true"
+                 placeholder="Seleccione un participante"
+                 [required]="true">
+        </p-select>
+      </div>
+      
+      <div class="field">
+        <label for="year" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Año</label>
+        <p-select [options]="years" 
+                 [(ngModel)]="selectedNewPaymentYear" 
+                 (onChange)="onNewPaymentYearChange()"
+                 optionLabel="label" 
+                 [style]="{width: '100%'}"
+                 placeholder="Seleccione un año">
+        </p-select>
+      </div>
+      
+      <div class="field">
+        <label for="weekNumber" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Número de Semana (1-52)</label>
+        <p-inputNumber id="weekNumber" [(ngModel)]="newPayment.weekNumber" [min]="1" [max]="52" 
+                       class="w-full"></p-inputNumber>
+      </div>
+    </div>
+    
+    <div class="flex justify-end mt-6">
+      <button pButton pRipple 
+              icon="pi pi-save" 
+              label="Registrar Pago"
+              class="p-button-primary"
+              (click)="createPayment()" 
+              [disabled]="!newPayment.participantId || !newPayment.weekNumber || !selectedNewPaymentYear"
+              [loading]="loading">
+      </button>
+    </div>
+  </div>
+
+  <!-- Cycle Payments (Admin) -->
+  <div *ngIf="activeTab === 'cyclePayments' && isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden p-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-900">Pagos del Ciclo</h2>
+      <div class="flex items-center gap-2">
+        <span class="p-float-label">
+          <p-select
+            [options]="years"
+            [(ngModel)]="selectedYear"
+            optionLabel="label"
+            (onChange)="loadCyclePayments()"
+            placeholder="Seleccionar año"
+            styleClass="w-full"
+          ></p-select>
+        </span>
+        <button pButton pRipple 
+                icon="pi pi-refresh" 
+                class="p-button-outlined p-button-secondary"
+                (click)="loadCyclePayments()">
+        </button>
+      </div>
+    </div>
+    
+    <div *ngIf="loadingCyclePayments" class="flex justify-center items-center p-8">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+    
+    <div *ngIf="!loadingCyclePayments && cyclePayments.length === 0" class="text-center py-12 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+      <div class="p-6">
+        <i class="pi pi-calendar-times text-5xl text-gray-400 mb-4"></i>
+        <h3 class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">No hay pagos registrados</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">No se encontraron pagos para el año {{selectedYear}}. Intenta con otro año o verifica los filtros.</p>
+        <button pButton 
+                icon="pi pi-refresh" 
+                label="Recargar"
+                class="p-button-outlined"
+                (click)="loadCyclePayments()">
+        </button>
+      </div>
+    </div>
+    
+    <div *ngIf="!loadingCyclePayments && cyclePayments.length > 0" class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+      <p-table [value]="cyclePayments" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[5,10,25,50]" 
+               [totalRecords]="cyclePayments.length" [loading]="loadingCyclePayments" 
+               styleClass="p-datatable-striped p-datatable-gridlines p-datatable-sm" 
+               [scrollable]="true" scrollHeight="400px" 
+               responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="participant.name" style="min-width: 200px">
+              <div class="flex items-center">
+                <i class="pi pi-user mr-2"></i>
+                <span>Participante</span>
+                <p-sortIcon field="participant.name"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="amount" style="width: 150px">
+              <div class="flex items-center">
+                <i class="pi pi-dollar mr-2"></i>
+                <span>Monto</span>
+                <p-sortIcon field="amount"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="weekNumber" style="width: 120px">
+              <div class="flex items-center">
+                <i class="pi pi-calendar mr-2"></i>
+                <span>Semana</span>
+                <p-sortIcon field="weekNumber"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="year" style="width: 120px">
+              <div class="flex items-center">
+                <i class="pi pi-calendar-plus mr-2"></i>
+                <span>Año</span>
+                <p-sortIcon field="year"></p-sortIcon>
+              </div>
+            </th>
+            <th pSortableColumn="createdAt" style="width: 200px">
+              <div class="flex items-center">
+                <i class="pi pi-clock mr-2"></i>
+                <span>Fecha de Registro</span>
+                <p-sortIcon field="createdAt"></p-sortIcon>
+              </div>
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-payment>
+          <tr>
+            <td>
+              <div class="flex flex-col">
+                <span class="font-medium text-surface-900 dark:text-surface-100">{{ payment.participant?.name || 'N/A' }}</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400">{{ payment.participant?.email || '' }}</span>
+              </div>
+            </td>
+            <td>
+              <span class="font-semibold" [ngClass]="{
+                'text-green-600': payment.amount > 0,
+                'text-red-600': payment.amount === 0
+              }">
+                {{ payment.amount | currency:'USD':'symbol':'1.2-2' }}
+              </span>
+            </td>
+            <td>
+              <span class="px-2 py-1 bg-primary-100 dark:bg-primary-900 text-primary-800 dark:text-primary-100 rounded-full text-xs font-medium">
+                Semana {{ payment.weekNumber }}
+              </span>
+            </td>
+            <td>{{ payment.year }}</td>
+            <td>{{ formatDate(payment.createdAt) }}</td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center p-4">
+              <p class="text-gray-500 dark:text-gray-400">No se encontraron registros</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Weekly Payments (Admin) -->
+  <div *ngIf="activeTab === 'weeklyPayments' && isAdmin" class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow overflow-hidden p-6">
+    <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-900 mb-6">Generar Pagos Semanales</h2>
+    
+
+    <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-4 mb-6 rounded">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <i class="pi pi-info-circle text-blue-500 text-xl"></i>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Generar pagos semanales</h3>
+          <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <p>Esta acción creará pagos para todos los participantes activos en la semana especificada.</p>
+            <p class="mt-1">Los participantes con pagos existentes para esta semana no serán modificados.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      <div class="field">
+        <label for="weeklyYear" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Año</label>
+        <p-select [options]="years" 
+                 [(ngModel)]="selectedWeeklyPaymentsYear" 
+                 (onChange)="onWeeklyPaymentsYearChange()"
+                 optionLabel="label" 
+                 [style]="{width: '100%'}"
+                 placeholder="Seleccione un año">
+        </p-select>
+      </div>
+      
+      <div class="field">
+        <label for="weeklyWeek" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Número de Semana (1-52)</label>
+        <p-inputNumber id="weeklyWeek" [(ngModel)]="weeklyPayments.weekNumber" [min]="1" [max]="52" 
+                       class="w-full"></p-inputNumber>
+      </div>
+      
+      <div class="field">
+        <label for="excludeParticipants" class="block text-sm font-medium text-surface-700 dark:text-surface-700 mb-2">Excluir Participantes</label>
+        <p-multiSelect [options]="participantOptions" 
+                     [(ngModel)]="weeklyPayments.excludeParticipantIds" 
+                     placeholder="Seleccione participantes a excluir" 
+                     optionLabel="label"
+                     optionValue="value"
+                     [style]="{width: '100%'}" 
+                     [showToggleAll]="false" 
+                     [filter]="true"
+                     class="w-full">
+        </p-multiSelect>
+      </div>
+    </div>
+    
+    <div class="flex justify-end">
+      <p-confirmDialog [style]="{width: '450px'}" [baseZIndex]="10000" [closeOnEscape]="true" [dismissableMask]="true"></p-confirmDialog>
+      <button pButton pRipple 
+              icon="pi pi-calendar-plus" 
+              label="Generar Pagos Semanales"
+              class="p-button-success"
+              (click)="confirmWeeklyPayments()">
+      </button>
+    </div>
+  </div>
+</div>
