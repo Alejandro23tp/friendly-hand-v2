@@ -93,6 +93,14 @@ export class Dashboard implements OnInit {
     year: this.activeCycle?.year || new Date().getFullYear()
   };
 
+  // Fund Report
+  fundReport: any = null;
+  loadingReport = false;
+  currentYear = new Date().getFullYear();
+  currentWeek = this.getWeekNumber(new Date());
+  selectedYear = this.currentYear;
+  selectedWeek = this.currentWeek;
+
   // Participant Dialog
   showParticipantDialog: boolean = false;
   
@@ -440,6 +448,7 @@ export class Dashboard implements OnInit {
     this.loadUserData();
     this.loadActiveCycle();
     this.loadAllCycles();
+    this.loadFundReport();
     this.loadLoans();
     this.loadActiveParticipants();
   }
@@ -649,8 +658,33 @@ export class Dashboard implements OnInit {
     this.selectedParticipant = null;
   }
 
-  // Formatting helpers
-  formatDate(date: Date | string | null | undefined): string {
+  // Load fund report
+  loadFundReport(year: number = this.currentYear, weekNumber: number = this.currentWeek) {
+    this.loadingReport = true;
+    this.annualCyclesService.getFundReport(year, weekNumber).subscribe({
+      next: (report) => {
+        this.fundReport = report;
+        this.loadingReport = false;
+      },
+      error: (error) => {
+        console.error('Error loading fund report:', error);
+        this.notificationService.error('Error al cargar el reporte de fondos');
+        this.loadingReport = false;
+      }
+    });
+  }
+
+  // Get week number from date
+  getWeekNumber(d: Date): number {
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    return weekNo;
+  }
+
+  // Helper method to format dates
+  formatDate(date: string | Date): string {
     if (!date) return 'N/A';
     return this.datePipe.transform(date, 'mediumDate') || 'N/A';
   }

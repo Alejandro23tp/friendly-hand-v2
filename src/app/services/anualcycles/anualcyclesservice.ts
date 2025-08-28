@@ -22,6 +22,7 @@ export interface AnnualCycle {
 })
 export class AnnualCyclesService {
   private apiUrl = `${environment.apiUrl}/annual-cycles`;
+  private apiurlFundReport = `${environment.apiUrl}/payments`;
 
   constructor(private http: HttpClient) {}
 
@@ -42,6 +43,15 @@ export class AnnualCyclesService {
 
   getAllCycles(): Observable<AnnualCycle[]> {
     return this.http.get<AnnualCycle[]>(this.apiUrl)
+      .pipe(catchError(this.handleError));
+  }
+
+  getFundReport(year?: number, weekNumber?: number): Observable<any> {
+    let params: any = {};
+    if (year) params.year = year.toString();
+    if (weekNumber) params.weekNumber = weekNumber.toString();
+    
+    return this.http.get(`${this.apiurlFundReport}/fund-report`, { params })
       .pipe(catchError(this.handleError));
   }
 

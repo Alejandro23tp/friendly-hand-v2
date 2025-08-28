@@ -1,128 +1,128 @@
-<div class="bg-surface-0 dark:bg-surface-0 px-6 md:px-12 lg:px-20 font-display">
-
-
+<div class="bg-surface-0 dark:bg-surface-0 px-4 sm:px-6 lg:px-8 xl:px-10 font-display py-6">
   <!-- Loading State -->
-  <div *ngIf="loading" class="flex justify-center items-center p-8">
-    <p-progressSpinner></p-progressSpinner>
+  <div *ngIf="loading" class="fixed inset-0 bg-black/10 dark:bg-black/30 flex items-center justify-center z-50">
+    <div class="bg-surface-0 dark:bg-surface-0 p-6 rounded-lg shadow-xl flex flex-col items-center">
+      <p-progressSpinner></p-progressSpinner>
+      <p class="mt-4 text-sm text-surface-600 dark:text-surface-300">Cargando datos del dashboard...</p>
+    </div>
   </div>
 
   <!-- Active Cycle Card -->
-  <div class="mb-8">
-    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
-      <h2 class="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-900">Ciclo Anual</h2>
+  <div class="mb-8 bg-surface-0 dark:bg-surface-0 rounded-xl shadow-sm border border-surface-100 dark:border-surface-700 p-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-surface-900 dark:text-surface-900">Ciclo Anual</h2>
+        <p class="text-sm text-surface-500 dark:text-surface-400">Gestión del ciclo actual y anteriores</p>
+      </div>
       <div class="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
-        <button *ngIf="isAdmin" pButton pRipple 
+        <button *ngIf="isAdmin" 
+                pButton pRipple 
                 icon="pi pi-plus"
                 label="Nuevo Ciclo"
-                class="p-button-sm w-full sm:w-auto"
+                class="p-button-sm"
                 (click)="showNewCycleDialog = true">
         </button>
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
       <!-- Active Cycle -->
-      <div class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow-lg overflow-hidden border border-surface-200 dark:border-surface-700 transition-colors duration-300">
-        <div class="p-6">
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800">
-              {{ activeCycle ? 'Ciclo Activo' : 'Sin ciclo activo' }}
-            </h3>
-            <span *ngIf="activeCycle" class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800/50">
-              Activo
-            </span>
+      <div *ngIf="activeCycle; else noActiveCycle" class="lg:col-span-2 bg-surface-50 dark:bg-surface-50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-900">
+            Ciclo {{ activeCycle.year }}
+          </h3>
+          <span class="px-3 py-1 rounded-full text-sm font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800/50">
+            Activo
+          </span>
+        </div>
+        
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-surface-0 dark:bg-surface-0 p-4 rounded-lg border border-surface-100 dark:border-surface-700">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Fondos Totales</p>
+              <p class="text-xl font-semibold text-primary-600 dark:text-primary-400">{{ formatCurrency(activeCycle.totalFunds || 0) }}</p>
+            </div>
+            <div class="bg-surface-0 dark:bg-surface-0 p-4 rounded-lg border border-surface-100 dark:border-surface-700">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés Total</p>
+              <p class="text-xl font-semibold text-green-600 dark:text-green-400">{{ formatCurrency(activeCycle.totalInterest || 0) }}</p>
+            </div>
+            <div class="bg-surface-0 dark:bg-surface-0 p-4 rounded-lg border border-surface-100 dark:border-surface-700">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Total de Acciones</p>
+              <p class="text-xl font-semibold text-purple-600 dark:text-purple-400">{{ activeCycle.totalShares || 0 }}</p>
+            </div>
+            <div class="bg-surface-0 dark:bg-surface-0 p-4 rounded-lg border border-surface-100 dark:border-surface-700">
+              <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés por Acción</p>
+              <p class="text-xl font-semibold text-amber-600 dark:text-amber-400">{{ (activeCycle.interestPerShare || 0) | number:'1.2-2' }}</p>
+            </div>
           </div>
           
-          <div *ngIf="activeCycle; else noActiveCycle" class="space-y-3">
-            <div class="flex items-center space-x-3">
-              <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">{{ activeCycle.year }}</p>
+          <div class="pt-4 mt-4 border-t border-surface-200 dark:border-surface-600">
+            <div class="flex flex-wrap items-center justify-between gap-2">
               <p class="text-sm text-surface-600 dark:text-surface-400">
+                <i class="pi pi-calendar mr-1"></i>
                 Iniciado el {{ formatDate(activeCycle.createdAt) }}
               </p>
-            </div>
-            
-            <div class="mt-4 pt-4 border-t border-surface-200 dark:border-surface-0 space-y-3">
-              <div class="grid grid-cols-2 gap-3">
-                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
-                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Fondos Totales</p>
-                  <p class="text-lg font-semibold text-primary-600 dark:text-primary-400">{{ formatCurrency(activeCycle.totalFunds || 0) }}</p>
-                </div>
-                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
-                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés Total</p>
-                  <p class="text-lg font-semibold text-green-600 dark:text-green-400">{{ formatCurrency(activeCycle.totalInterest || 0) }}</p>
-                </div>
-                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
-                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés Proyectado</p>
-                  <p class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ formatCurrency(activeCycle.projectedInterest || 0) }}</p>
-                </div>
-                <div class="bg-white dark:bg-surface-100 p-3 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
-                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Total de Acciones</p>
-                  <p class="text-lg font-semibold text-purple-600 dark:text-purple-400">{{ activeCycle.totalShares || 0 }}</p>
-                </div>
-                <div class="col-span-2 bg-white dark:bg-surface-100 p-4 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
-                  <p class="text-xs text-surface-500 dark:text-surface-400 mb-1">Interés por Acción</p>
-                  <p class="text-2xl font-bold text-amber-600 dark:text-amber-400">{{ (activeCycle.interestPerShare || 0) | number:'1.2-2' }}</p>
-                </div>
-              </div>
-            </div>
-            <div class="mt-4 flex justify-end">
               <button *ngIf="isAdmin" 
                       pButton pRipple 
                       label="Cerrar Ciclo" 
                       icon="pi pi-lock"
-                      class="p-button-sm p-button-danger"
-                      (click)="closeCurrentCycle()"></button>
+                      class="p-button-sm p-button-outlined p-button-danger"
+                      (click)="closeCurrentCycle()">
+              </button>
             </div>
           </div>
-          
-          <ng-template #noActiveCycle>
-            <p class="text-surface-600 dark:text-surface-700 mb-4">
-              No hay un ciclo anual activo actualmente. Crea un nuevo ciclo para comenzar.
-            </p>
-          </ng-template>
         </div>
       </div>
+      
+      <ng-template #noActiveCycle>
+        <div class="lg:col-span-2 bg-surface-50 dark:bg-surface-50 rounded-xl shadow-sm overflow-hidden border-2 border-dashed border-surface-200 dark:border-surface-600 p-8 text-center">
+          <div class="mb-4">
+            <i class="pi pi-inbox text-4xl text-surface-400"></i>
+          </div>
+          <h3 class="text-lg font-medium text-surface-700 dark:text-surface-700 mb-2">Sin ciclo activo</h3>
+          <p class="text-sm text-surface-500 dark:text-surface-500 mb-4">
+            No hay un ciclo anual activo actualmente.
+          </p>
+          <button *ngIf="isAdmin" 
+                  pButton pRipple 
+                  label="Crear Nuevo Ciclo" 
+                  icon="pi pi-plus"
+                  class="p-button-sm"
+                  (click)="showNewCycleDialog = true">
+          </button>
+        </div>
+      </ng-template>
 
       <!-- Recent Cycles -->
-      <div class="bg-surface-50 dark:bg-surface-50 rounded-lg shadow-lg overflow-hidden border border-surface-200 dark:border-surface-700 transition-colors duration-300">
-        <div class="p-6">
-          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Ciclos Anteriores</h3>
+      <div class="bg-surface-50 dark:bg-surface-50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 hover:shadow-md transition-shadow duration-200">
+        <div class="p-5">
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-900 mb-4">Ciclos Anteriores</h3>
           
-          <div *ngIf="allCycles.length > 0; else noCycles">
-            <div class="space-y-3">
-              <div *ngFor="let cycle of allCycles" class="bg-white dark:bg-surface-100 p-4 rounded-lg border border-surface-100 dark:border-surface-200 hover:shadow transition-shadow">
-                <div class="flex justify-between items-center">
-                  <div class="space-y-1">
-                    <p class="font-medium text-surface-900 dark:text-surface-900">{{ cycle.year }}</p>
-                    <p class="text-sm text-surface-600 dark:text-surface-500">
-                      {{ cycle.status === 'closed' ? 'Cerrado' : 'Activo' }} • 
-                      {{ formatDate(cycle.closedAt || cycle.createdAt) }}
-                    </p>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <span class="px-2 py-1 rounded-full text-xs font-medium" 
-                          [ngClass]="{
-                            'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-800/50': cycle.status === 'active',
-                            'bg-surface-100 dark:bg-surface-200 text-surface-800 border border-surface-200 dark:border-surface-300': cycle.status === 'closed'
-                          }">
-                      {{ cycle.status === 'active' ? 'Activo' : 'Cerrado' }}
-                    </span>
-                    <span class="text-base font-semibold" 
-                          [ngClass]="{
-                            'text-primary-600 dark:text-primary-500': cycle.status === 'active',
-                            'text-surface-600 dark:text-surface-500': cycle.status === 'closed'
-                          }">
-                      {{ formatCurrency(cycle.totalFunds || 0) }}
-                    </span>
-                  </div>
+          <div *ngIf="allCycles.length > 0; else noCycles" class="space-y-3">
+            <div *ngFor="let cycle of allCycles" class="bg-surface-0 dark:bg-surface-0 p-4 rounded-lg border border-surface-100 dark:border-surface-700 hover:shadow transition-shadow">
+              <div class="flex justify-between items-center">
+                <div class="space-y-1">
+                  <p class="font-medium text-surface-900 dark:text-white">{{ cycle.year }}</p>
+                  <p class="text-sm text-surface-500 dark:text-surface-400">
+                    {{ cycle.status === 'closed' ? 'Cerrado' : 'Activo' }} • 
+                    {{ formatDate(cycle.closedAt || cycle.createdAt) }}
+                  </p>
                 </div>
+                <span class="text-base font-semibold" 
+                      [ngClass]="{
+                        'text-primary-600 dark:text-primary-400': cycle.status === 'active',
+                        'text-surface-600 dark:text-surface-400': cycle.status === 'closed'
+                      }">
+                  {{ formatCurrency(cycle.totalFunds || 0) }}
+                </span>
               </div>
             </div>
           </div>
           
           <ng-template #noCycles>
-            <div class="bg-white dark:bg-surface-100 p-6 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-300 text-center">
-              <p class="text-surface-500 dark:text-surface-500">
+            <div class="bg-surface-0 dark:bg-surface-0 p-6 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-600 text-center">
+              <p class="text-surface-500 dark:text-surface-400">
                 No hay ciclos registrados
               </p>
             </div>
@@ -132,8 +132,250 @@
     </div>
   </div>
 
+  <!-- Fund Report Section -->
+  <div class="mb-8 bg-surface-0 dark:bg-surface-0 rounded-xl shadow-sm border border-surface-100 dark:border-surface-700 p-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-surface-900 dark:text-white">Reporte de Fondos</h2>
+        <p class="text-sm text-surface-500 dark:text-surface-400">Resumen financiero actualizado</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div class="flex items-end gap-2">
+          <div class="flex flex-col">
+            <label for="yearInput" class="text-xs text-surface-600 dark:text-surface-400 mb-1 ml-1">Año</label>
+            <div class="flex items-center border border-surface-200 dark:border-surface-600 rounded-md overflow-hidden">
+              <span class="bg-surface-50 dark:bg-surface-50 h-9 flex items-center justify-center px-3">
+                <i class="pi pi-calendar text-sm text-surface-500"></i>
+              </span>
+              <input id="yearInput"
+                     type="number" 
+                     pInputText 
+                     [(ngModel)]="selectedYear" 
+                     (change)="loadFundReport(selectedYear, selectedWeek)" 
+                     min="2020" 
+                     [max]="currentYear" 
+                     [disabled]="loadingReport"
+                     class="w-20 border-0 shadow-none focus:ring-0 h-9 px-2">
+            </div>
+          </div>
+          
+          <div class="flex flex-col">
+            <label for="weekInput" class="text-xs text-surface-600 dark:text-surface-400 mb-1 ml-1">Semana</label>
+            <div class="flex items-center border border-surface-200 dark:border-surface-600 rounded-md overflow-hidden">
+              <span class="bg-surface-50 dark:bg-surface-50 h-9 flex items-center justify-center px-3">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-surface-500">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                  <path d="M8 14h.01"></path>
+                  <path d="M12 14h.01"></path>
+                  <path d="M16 14h.01"></path>
+                  <path d="M8 18h.01"></path>
+                  <path d="M12 18h.01"></path>
+                </svg>
+              </span>
+              <input id="weekInput"
+                     type="number" 
+                     pInputText 
+                     [(ngModel)]="selectedWeek" 
+                     (change)="loadFundReport(selectedYear, selectedWeek)"
+                     min="1" 
+                     max="52" 
+                     [disabled]="loadingReport"
+                     class="w-16 border-0 shadow-none focus:ring-0 h-9 px-2">
+            </div>
+          </div>
+          <button pButton 
+                  pRipple 
+                  icon="pi pi-refresh" 
+                  class="p-button-sm p-button-outlined"
+                  [disabled]="loadingReport"
+                  pTooltip="Actualizar reporte"
+                  tooltipPosition="top"
+                  (click)="loadFundReport(selectedYear, selectedWeek)">
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingReport" class="flex flex-col items-center justify-center p-8 rounded-lg border-2 border-dashed border-surface-200 dark:border-surface-700">
+      <p-progressSpinner></p-progressSpinner>
+      <p class="mt-4 text-sm text-surface-500 dark:text-surface-400">Generando reporte...</p>
+    </div>
+
+    <!-- Fund Report Content -->
+    <div *ngIf="fundReport && !loadingReport" class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Current Balance -->
+      <div class="bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Saldo Real</h3>
+        <div class="text-center py-4">
+          <p class="text-3xl font-bold text-primary-600 dark:text-primary-400">
+            {{ formatCurrency(fundReport.currentBalance?.realBalance || 0) }}
+          </p>
+          <p class="text-sm text-surface-600 dark:text-surface-500 mt-2">
+            Actualizado el {{ fundReport.reportInfo?.reportDate | date:'medium' }}
+          </p>
+        </div>
+        <div class="mt-4 pt-4 border-t border-surface-200 dark:border-surface-700">
+          <p class="text-sm font-medium text-surface-700 dark:text-surface-800">Progreso del Año</p>
+          <div class="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2.5 mt-2">
+            <div class="bg-blue-600 h-2.5 rounded-full" 
+                 [style.width.%]="fundReport.reportInfo?.progressPercentage || 0"></div>
+          </div>
+          <div class="flex justify-between text-xs text-surface-600 dark:text-surface-400 mt-1">
+            <span>Semana {{ fundReport.reportInfo?.currentWeek || 0 }}/52</span>
+            <span>{{ fundReport.reportInfo?.progressPercentage || 0 }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Income Summary -->
+      <div class="bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Ingresos</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Pagos Semanales</span>
+            <span class="font-medium">{{ formatCurrency(fundReport.income?.totalPayments || 0) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Intereses Cobrados</span>
+            <span class="font-medium text-green-600 dark:text-green-400">+{{ formatCurrency(fundReport.income?.interestCollected || 0) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Capital Recuperado</span>
+            <span class="font-medium text-blue-600 dark:text-blue-400">+{{ formatCurrency(fundReport.income?.principalRecovered || 0) }}</span>
+          </div>
+          <div class="pt-3 mt-3 border-t border-surface-200 dark:border-surface-700 flex justify-between font-semibold">
+            <span>Total Ingresos</span>
+            <span class="text-green-600 dark:text-green-400">{{ formatCurrency(fundReport.income?.totalIncome || 0) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses Summary -->
+      <div class="bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Egresos</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Préstamos Activos</span>
+            <span class="font-medium text-red-600 dark:text-red-400">-{{ formatCurrency(fundReport.expenses?.activeLoans || 0) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Préstamos Pagados</span>
+            <span class="font-medium">{{ formatCurrency(fundReport.expenses?.paidLoans || 0) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-surface-600 dark:text-surface-500">Préstamos Cancelados</span>
+            <span class="font-medium text-amber-600 dark:text-amber-400">-{{ formatCurrency(fundReport.expenses?.cancelledLoans || 0) }}</span>
+          </div>
+          <div class="pt-3 mt-3 border-t border-surface-200 dark:border-surface-700">
+            <div class="flex justify-between font-medium mb-1">
+              <span>Total Préstamos Emitidos</span>
+              <span>{{ formatCurrency(fundReport.expenses?.totalLoansIssued || 0) }}</span>
+            </div>
+            <div class="text-xs text-surface-500 dark:text-surface-400">
+              {{ fundReport.expenses?.activeLoanCount || 0 }} activos • 
+              {{ fundReport.expenses?.paidLoanCount || 0 }} pagados • 
+              {{ fundReport.expenses?.cancelledLoanCount || 0 }} cancelados
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Participants Summary -->
+      <div class="lg:col-span-3 bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Resumen de Participantes</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ fundReport.participants?.activeCount || 0 }}</p>
+            <p class="text-sm text-surface-600 dark:text-surface-400">Participantes Activos</p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ fundReport.participants?.totalShares || 0 }}</p>
+            <p class="text-sm text-surface-600 dark:text-surface-400">Total de Acciones</p>
+          </div>
+          <div class="text-center p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400">{{ (fundReport.participants?.averageSharesPerParticipant || 0) | number:'1.1-1' }}</p>
+            <p class="text-sm text-surface-600 dark:text-surface-400">Promedio de Acciones por Participante</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projections -->
+      <div class="lg:col-span-2 bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 p-5 hover:shadow-md transition-shadow duration-200">
+        <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Proyecciones Fin de Año</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-sm text-surface-600 dark:text-surface-400">Pagos Totales Proyectados</p>
+            <p class="text-xl font-semibold">{{ formatCurrency(fundReport.projections?.projectedTotalPayments || 0) }}</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-sm text-surface-600 dark:text-surface-400">Intereses Totales Proyectados</p>
+            <p class="text-xl font-semibold text-green-600 dark:text-green-400">{{ formatCurrency(fundReport.projections?.projectedInterestTotal || 0) }}</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-sm text-surface-600 dark:text-surface-400">Saldo Final Proyectado</p>
+            <p class="text-xl font-semibold text-blue-600 dark:text-blue-400">{{ formatCurrency(fundReport.projections?.projectedFinalBalance || 0) }}</p>
+          </div>
+          <div class="p-4 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+            <p class="text-sm text-surface-600 dark:text-surface-400">Retorno Estimado por Acción</p>
+            <p class="text-xl font-semibold text-amber-600 dark:text-amber-400">{{ formatCurrency(fundReport.projections?.estimatedReturnPerShare || 0) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="bg-surface-50 dark:bg-surface-700/50 rounded-xl shadow-sm overflow-hidden border border-surface-100 dark:border-surface-600 hover:shadow-md transition-shadow duration-200">
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-800 mb-4">Resumen</h3>
+          <div class="flex items-center mb-4">
+            <div class="p-3 rounded-full" 
+                 [ngClass]="{
+                   'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': fundReport.summary?.status === 'POSITIVO',
+                   'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300': fundReport.summary?.status !== 'POSITIVO'
+                 }">
+              <i class="pi" [ngClass]="{
+                'pi-check-circle': fundReport.summary?.status === 'POSITIVO',
+                'pi-exclamation-circle': fundReport.summary?.status !== 'POSITIVO'
+              }"></i>
+            </div>
+            <div class="ml-4">
+              <p class="font-medium">Estado del Fondo: {{ fundReport.summary?.status || 'N/A' }}</p>
+              <p class="text-sm text-surface-600 dark:text-surface-400">Salud del Fondo: {{ fundReport.summary?.healthScore || 0 }}%</p>
+            </div>
+          </div>
+          
+          <div class="mt-4">
+            <p class="text-sm font-medium text-surface-700 dark:text-surface-800 mb-2">Próxima Semana</p>
+            <div class="p-3 bg-white dark:bg-surface-100 rounded-lg border border-surface-100 dark:border-surface-700">
+              <p class="text-sm text-surface-600 dark:text-surface-400">Saldo Proyectado</p>
+              <p class="text-lg font-semibold text-primary-600 dark:text-primary-400">
+                {{ formatCurrency(fundReport.summary?.nextWeekProjection || 0) }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-6">
+            <p class="text-sm font-medium text-surface-700 dark:text-surface-800 mb-2">Recomendaciones</p>
+            <ul class="space-y-2">
+              <li *ngFor="let action of fundReport.summary?.recommendedActions || []" class="flex items-start">
+                <i class="pi pi-info-circle text-blue-500 mt-1 mr-2"></i>
+                <span class="text-sm text-surface-600 dark:text-surface-400">{{ action }}</span>
+              </li>
+              <li *ngIf="!fundReport.summary?.recommendedActions?.length" class="text-sm text-surface-500 dark:text-surface-400">
+                No hay recomendaciones disponibles.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Loans Section -->
-  <div class="mb-8">
+  <div class="mb-8 bg-surface-0 dark:bg-surface-0 rounded-xl shadow-sm border border-surface-100 dark:border-surface-700 p-6">
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
       <h2 class="text-lg sm:text-xl font-semibold text-surface-900 dark:text-surface-900">Préstamos</h2>
       <button *ngIf="isAdmin" 
