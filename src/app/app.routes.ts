@@ -6,6 +6,7 @@ import { Participantes } from './pages/participantes/participantes';
 import { AuthGuard } from './guards/auth.guard';
 import { AuthService } from './services/auth/authservice';
 import { PaymentComponent } from './pages/payment/payment';
+import { Reportes } from './pages/reportes/reportes';
 
 export const routes: Routes = [
   {
@@ -39,6 +40,12 @@ export const routes: Routes = [
     path: 'payment',
     component: PaymentComponent,
     title: 'Pagos',
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'reportes',
+    component: Reportes,
+    title: 'Reportes',
     canActivate: [AuthGuard]
   },
   {

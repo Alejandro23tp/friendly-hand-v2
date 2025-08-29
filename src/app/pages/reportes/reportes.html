@@ -1,0 +1,298 @@
+<div class="bg-surface-0 dark:bg-surface-0 px-6 md:px-12 lg:px-20 font-display min-h-screen">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8 pt-6">
+    <h1 class="text-xl sm:text-2xl font-bold text-surface-900 dark:text-surface-900">
+      <span class="text-primary-600 dark:text-primary-400">Reportes de Participantes</span>
+    </h1>
+    <div class="relative w-full sm:w-96">
+      <div class="relative w-full">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-surface-500">
+          <i class="pi pi-search"></i>
+        </span>
+        <input 
+          type="text" 
+          pInputText 
+          class="w-full pl-10 pr-4 py-2.5" 
+          placeholder="Buscar participante..."
+          [(ngModel)]="searchTerm"
+          (input)="onSearch()"
+          style="padding-left: 2.5rem;"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="flex flex-col items-center justify-center p-12 bg-surface-0 dark:bg-surface-0 rounded-lg">
+    <p-progressSpinner></p-progressSpinner>
+    <p class="mt-4 text-surface-600 dark:text-surface-300">Cargando reportes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="bg-surface-0 dark:bg-surface-0 border border-red-200 dark:border-red-900 rounded-lg p-6 text-center">
+    <p class="text-red-700 dark:text-red-400 mb-4">{{ error }}</p>
+    <button 
+      pButton 
+      icon="pi pi-refresh" 
+      label="Reintentar" 
+      (click)="loadReports()"
+      class="p-button-sm"
+    ></button>
+  </div>
+
+  <!-- Reports Data -->
+  <div *ngIf="reportsData && !loading" class="space-y-6">
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-surface-0 dark:bg-surface-0">
+      <p-card class="bg-surface-0 dark:bg-surface-50 shadow-sm hover:shadow-md transition-shadow border border-surface-0 dark:border-surface-0">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{{ reportsData.summary.totalParticipants }}</div>
+          <div class="text-surface-600 dark:text-surface-300 mt-1">Total Participantes</div>
+        </div>
+      </p-card>
+      <p-card class="bg-surface-0 dark:bg-surface-50 shadow-sm hover:shadow-md transition-shadow border border-surface-200 dark:border-surface-700">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ reportsData.summary.participantsUpToDate }}</div>
+          <div class="text-surface-600 dark:text-surface-300 mt-1">Al Día</div>
+        </div>
+      </p-card>
+      <p-card class="bg-surface-0 dark:bg-surface-50 shadow-sm hover:shadow-md transition-shadow border border-surface-200 dark:border-surface-700">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ reportsData.summary.participantsWithMissedPayments }}</div>
+          <div class="text-surface-600 dark:text-surface-300 mt-1">Con Atrasos</div>
+        </div>
+      </p-card>
+      <p-card class="bg-surface-0 dark:bg-surface-50 shadow-sm hover:shadow-md transition-shadow border border-surface-200 dark:border-surface-700">
+        <div class="text-center">
+          <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ reportsData.summary.participantsWithPositiveBalance }}</div>
+          <div class="text-surface-600 dark:text-surface-300 mt-1">Con Saldo a Favor</div>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Progress Bar -->
+    <p-card class="bg-surface-0 dark:bg-surface-50 shadow-sm border border-surface-200 dark:border-surface-700">
+      <div class="mb-2 flex justify-between text-sm text-surface-600 dark:text-surface-300">
+        <span>Progreso del año</span>
+        <span class="font-medium">{{ reportsData.reportInfo.progressPercentage | number:'1.0-0' }}%</span>
+      </div>
+      <p-progressBar 
+        [value]="reportsData.reportInfo.progressPercentage"
+        [showValue]="false"
+        styleClass="h-2"
+      ></p-progressBar>
+      <div class="mt-1 text-xs text-surface-500 dark:text-surface-400 text-right">
+        Semana {{ reportsData.reportInfo.weekNumber }} de {{ reportsData.reportInfo.totalWeeks }}
+      </div>
+    </p-card>
+
+    <!-- Participants List -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <p-card 
+        *ngFor="let report of filteredReports" 
+        class="bg-surface-0 dark:bg-surface-50 hover:shadow-lg transition-shadow border border-surface-200 dark:border-surface-700"
+        [style.border-left]="'4px solid ' + (getStatusColor(report.overallStatus) === 'text-green-500' ? '#10B981' : getStatusColor(report.overallStatus) === 'text-red-500' ? '#EF4444' : '#3B82F6')"
+      >
+        <div class="flex justify-between items-start mb-4">
+          <div>
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-900">{{ report.participantInfo.name }}</h3>
+            <div class="flex items-center mt-1">
+              <i [class]="getStatusIcon(report.overallStatus) + ' mr-1 ' + getStatusColor(report.overallStatus)"></i>
+              <span class="text-sm" [ngClass]="getStatusClass(report.overallStatus)">
+                {{ report.overallStatus }}
+              </span>
+            </div>
+          </div>
+          <div class="flex space-x-1">
+            <button 
+              pButton 
+              icon="pi pi-eye" 
+              class="p-button-text p-button-sm"
+              pTooltip="Vista previa"
+              tooltipPosition="top"
+              (click)="previewReport(report)"
+            ></button>
+            <button 
+              pButton 
+              icon="pi pi-download" 
+              class="p-button-text p-button-sm"
+              pTooltip="Descargar PDF"
+              tooltipPosition="top"
+              (click)="generatePdf(report)"
+            ></button>
+          </div>
+        </div>
+        
+        <div class="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+          <div class="flex justify-between">
+            <span class="font-medium">Email:</span>
+            <span>{{ report.participantInfo.email }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Aportación:</span>
+            <span>{{ report.participantInfo.weeklyContribution | currency }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Total Pagado:</span>
+            <span class="font-semibold">{{ report.paymentSummary.totalPaid | currency }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="font-medium">Eficiencia:</span>
+            <span [ngClass]="{
+              'text-green-500': report.paymentSummary.paymentEfficiency >= 90,
+              'text-yellow-500': report.paymentSummary.paymentEfficiency >= 70 && report.paymentSummary.paymentEfficiency < 90,
+              'text-red-500': report.paymentSummary.paymentEfficiency < 70
+            }">
+              {{ report.paymentSummary.paymentEfficiency | number:'1.0-1' }}%
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="report.personalMessage" class="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md text-sm text-blue-800 dark:text-blue-200">
+          <i class="pi pi-info-circle mr-1"></i>
+          {{ report.personalMessage }}
+        </div>
+      </p-card>
+    </div>
+
+    <div *ngIf="filteredReports.length === 0" class="text-center py-8 text-gray-500">
+      <i class="pi pi-search text-4xl mb-2"></i>
+      <p>No se encontraron participantes que coincidan con la búsqueda.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Dialog -->
+<p-dialog 
+  header="Vista Previa del Reporte" 
+  [(visible)]="previewVisible" 
+  [style]="{ width: '90vw', maxWidth: '800px' }"
+  [modal]="true"
+  [dismissableMask]="true"
+  [resizable]="false"
+  [contentStyle]="{ 'border-radius': '8px' }"
+>
+  <div *ngIf="selectedParticipant" class="p-4">
+    <div class="text-center mb-6">
+      <h2 class="text-xl font-bold text-primary-600 mb-1">Reporte de Participante</h2>
+      <p class="text-gray-600">Generado el {{ today | date:'mediumDate' }}</p>
+    </div>
+    
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold border-b pb-1 mb-3">Información del Participante</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500">Nombre Completo</p>
+          <p class="font-medium">{{ selectedParticipant.participantInfo.name }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Email</p>
+          <p class="font-medium">{{ selectedParticipant.participantInfo.email }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Estado</p>
+          <p class="font-medium">
+            <i [class]="getStatusIcon(selectedParticipant.overallStatus) + ' mr-1 ' + getStatusColor(selectedParticipant.overallStatus)"></i>
+            {{ selectedParticipant.overallStatus }}
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Aportación Semanal</p>
+          <p class="font-medium">{{ selectedParticipant.participantInfo.weeklyContribution | currency }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h3 class="text-lg font-semibold border-b pb-1 mb-3">Resumen de Pagos</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500">Total Pagado</p>
+          <p class="text-lg font-bold">{{ selectedParticipant.paymentSummary.totalPaid | currency }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Eficiencia de Pago</p>
+          <p class="text-lg font-bold" [ngClass]="{
+            'text-green-500': selectedParticipant.paymentSummary.paymentEfficiency >= 90,
+            'text-yellow-500': selectedParticipant.paymentSummary.paymentEfficiency >= 70 && selectedParticipant.paymentSummary.paymentEfficiency < 90,
+            'text-red-500': selectedParticipant.paymentSummary.paymentEfficiency < 70
+          }">
+            {{ selectedParticipant.paymentSummary.paymentEfficiency | number:'1.0-1' }}%
+          </p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Semanas con Pagos</p>
+          <p class="font-medium">{{ selectedParticipant.paymentSummary.weeksWithPayments }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Semanas Atrasadas</p>
+          <p class="font-medium">{{ selectedParticipant.paymentSummary.missedWeeks }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedParticipant.loanSummary && selectedParticipant.loanSummary.activeLoanAmount > 0" class="mb-6">
+      <h3 class="text-lg font-semibold border-b pb-1 mb-3">Información de Préstamos</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-sm text-gray-500">Monto del Préstamo Activo</p>
+          <p class="font-medium">{{ selectedParticipant.loanSummary.activeLoanAmount | currency }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Estado de Préstamos</p>
+          <div class="space-y-1" *ngIf="isLoanStatusArray(selectedParticipant.loanSummary.loanStatus)">
+            <div *ngFor="let loan of selectedParticipant.loanSummary.loanStatus" class="flex items-center">
+              <span class="w-2 h-2 rounded-full mr-2" [ngClass]="{
+                'bg-green-500': loan.status === 'paid',
+                'bg-yellow-500': loan.status === 'deferred',
+                'bg-red-500': loan.status === 'overdue',
+                'bg-blue-500': !['paid', 'deferred', 'overdue'].includes(loan.status)
+              }"></span>
+              <span class="text-sm">
+                {{ loan.amount | currency }} - 
+                <ng-container *ngIf="loan.status">
+                  <ng-container [ngSwitch]="loan.status.toLowerCase()">
+                    <span *ngSwitchCase="'paid'">Pagado</span>
+                    <span *ngSwitchCase="'deferred'">Diferido</span>
+                    <span *ngSwitchCase="'overdue'">Vencido</span>
+                    <span *ngSwitchCase="'active'">Activo</span>
+                    <span *ngSwitchDefault>{{ loan.status | titlecase }}</span>
+                  </ng-container>
+                </ng-container>
+                <span *ngIf="loan.dueDate" class="text-xs text-gray-500 ml-2">(Vence: {{ loan.dueDate | date:'shortDate' }})</span>
+              </span>
+            </div>
+          </div>
+          <p class="text-sm font-medium" *ngIf="!isLoanStatusArray(selectedParticipant.loanSummary.loanStatus)">
+            {{ selectedParticipant.loanSummary.loanStatus || 'Sin préstamos activos' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedParticipant.personalMessage" class="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md text-blue-800 dark:text-blue-200 mb-6">
+      <i class="pi pi-info-circle mr-1"></i>
+      {{ selectedParticipant.personalMessage }}
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-between">
+      <button 
+        pButton 
+        label="Cerrar" 
+        icon="pi pi-times" 
+        (click)="previewVisible = false"
+        class="p-button-text"
+      ></button>
+      <button 
+        *ngIf="selectedParticipant"
+        pButton 
+        label="Descargar PDF" 
+        icon="pi pi-download" 
+        (click)="generatePdf(selectedParticipant)"
+        class="p-button-primary"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

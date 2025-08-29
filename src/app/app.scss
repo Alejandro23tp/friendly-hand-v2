@@ -532,4 +532,30 @@
     transition: border-color var(--p-checkbox-transition-duration, 0.2s) ease-in-out, 
                 box-shadow var(--p-checkbox-transition-duration, 0.2s) ease-in-out;
   }
+
+  .p-card {
+    --p-card-background: var(--surface-50);
+    --p-card-border-color: var(--surface-50);
+    --p-card-color: var(--surface-700);
+    --p-card-hover-border-color: #80bdff;
+    --p-card-focus-border-color: #4d94ff;
+    --p-card-focus-ring-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    --p-card-placeholder-color: var(--surface-600);
+    --p-card-clear-icon-color: var(--surface-600);
+    --p-card-dropdown-color: var(--surface-600);
+    --p-card-overlay-background: var(--surface-0);
+    --p-card-overlay-border-color: var(--surface-50);
+    --p-card-option-color: var(--surface-700);
+    --p-card-option-focus-background: var(--surface-100);
+    --p-card-option-focus-color: var(--surface-700);
+    --p-card-option-selected-background: var(--surface-100);
+    --p-card-option-selected-color: var(--surface-700);
+    --p-card-option-selected-focus-background: var(--surface-100);
+    --p-card-checkmark-color: var(--surface-700);
+    --p-card-option-hover-bg: var(--surface-100);
+    --p-card-option-selected-hover-bg: var(--surface-100);
+    background: var(--p-card-background, var(--surface-0));
+    border: 1px solid var(--p-card-border-color, var(--surface-50));
+    border-radius: var(--p-card-border-radius, 6px);
+  }
 }

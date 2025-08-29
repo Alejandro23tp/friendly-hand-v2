@@ -26,8 +26,8 @@ export class SidebarComponent {
   menuItems = [
     { label: 'Dashboard', icon: 'pi pi-th-large', route: '/dashboard' },
     { label: 'Participantes', icon: 'pi pi-users', route: '/participantes' },
-    { label: 'Clientes', icon: 'pi pi-briefcase', route: '/dashboard/clientes' },
-    { label: 'Reportes', icon: 'pi pi-chart-line', route: '/dashboard/reportes' },
+    { label: 'Pagos', icon: 'pi pi-wallet', route: '/payment' },
+    { label: 'Reportes', icon: 'pi pi-chart-line', route: '/reportes' },
   ];
 
   get isDark() {
