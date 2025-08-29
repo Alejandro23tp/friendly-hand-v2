@@ -8,10 +8,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { MessageService } from 'primeng/api';
 import { Reportservice } from '../../services/report/reportservice';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { NotificationService } from '../../services/notification.service';
 
 export interface ParticipantInfo {
   name: string;
@@ -95,7 +95,7 @@ import { jsPDF } from 'jspdf';
     MessageModule,
     ToastModule
   ],
-  providers: [MessageService]
+  providers: []
 })
 export class Reportes implements OnInit {
   reportsData: ParticipantsReportsResponse | null = null;
@@ -110,7 +110,7 @@ export class Reportes implements OnInit {
 
   constructor(
     private reportService: Reportservice,
-    private messageService: MessageService
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit() {
@@ -131,12 +131,7 @@ export class Reportes implements OnInit {
         console.error('Error loading reports:', err);
         this.error = 'Error al cargar los reportes. Por favor, intente de nuevo más tarde.';
         this.loading = false;
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudieron cargar los reportes',
-          life: 5000
-        });
+        this.notificationService.error('No se pudieron cargar los reportes');
       }
     });
   }
@@ -164,12 +159,7 @@ export class Reportes implements OnInit {
 
   generatePdf(participant: ParticipantReport) {
     if (typeof jsPDF === 'undefined') {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo cargar el generador de PDF',
-        life: 5000
-      });
+      this.notificationService.error('No se pudo cargar el generador de PDF');
       return;
     }
 
@@ -243,7 +233,6 @@ export class Reportes implements OnInit {
       });
       
       // Add loan info if exists
-      console.log(participant);
       if (participant.loanSummary && participant.loanSummary.activeLoanAmount > 0) {
         y += 7;
         doc.setFont('helvetica', 'bold');
@@ -366,21 +355,11 @@ export class Reportes implements OnInit {
       // Save the PDF
       doc.save(`reporte-${participant.participantInfo.name.replace(/\s+/g, '-').toLowerCase()}.pdf`);
       
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: 'El reporte se ha descargado correctamente',
-        life: 3000
-      });
+      this.notificationService.success('El reporte se ha descargado correctamente');
       
     } catch (error) {
       console.error('Error generating PDF:', error);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Ocurrió un error al generar el PDF',
-        life: 5000
-      });
+      this.notificationService.error('Ocurrió un error al generar el PDF');
     } finally {
       this.pdfLoading = false;
     }

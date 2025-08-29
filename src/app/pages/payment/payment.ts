@@ -131,7 +131,6 @@ export class PaymentComponent implements OnInit {
         // Sort years in descending order (newest first)
         this.years.sort((a, b) => b.value - a.value);
         
-        console.log('Available years loaded:', this.years);
         
         // Execute callback if provided
         if (callback) {
@@ -269,12 +268,10 @@ export class PaymentComponent implements OnInit {
       return;
     }
     
-    console.log('Loading cycle payments for year:', this.selectedYear.value);
     this.loadingCyclePayments = true;
     
     this.paymentService.getCyclePayments(this.selectedYear.value).subscribe({
       next: (payments) => {
-        console.log(payments, "Antes")
         this.cyclePayments = payments.map(payment => ({
           ...payment,
           participantName: payment.participant?.name || 'Unknown',
@@ -282,7 +279,6 @@ export class PaymentComponent implements OnInit {
           cycleYear: payment.year,
           createdAt: payment.createdAt
         } as PaymentDto));
-        console.log(`Loaded ${payments.length} cycle payments for year ${this.selectedYear?.value}`);
       },
       error: (error) => {
         console.error('Error loading cycle payments:', error);
@@ -315,7 +311,6 @@ export class PaymentComponent implements OnInit {
   checkAdminStatus() {
     try {
       this.isAdmin = this.authService.isAdmin;
-      console.log('Admin status:', this.isAdmin);
       
       // Update active tab based on admin status
       if (this.activeTab === 'myPayments' && this.isAdmin) {
@@ -387,7 +382,6 @@ export class PaymentComponent implements OnInit {
     
     this.paymentService.createPayment(participantId, paymentData).subscribe({
       next: (payment) => {
-        console.log('Payment created successfully:', payment);
         this.notificationService.success('Pago registrado correctamente');
         
         // Only reload the cycle payments if we're an admin
