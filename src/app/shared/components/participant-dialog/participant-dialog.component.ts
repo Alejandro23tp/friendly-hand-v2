@@ -55,6 +55,7 @@ export class ParticipantDialogComponent implements OnChanges {
     role: 'user',
     name: '',
     email: '',
+    phone: '',
     shares: 0
   };
   
@@ -68,6 +69,7 @@ export class ParticipantDialogComponent implements OnChanges {
         password: this.participant.password || this.defaultPassword,
         name: this.participant.name || '',
         email: this.participant.email || '',
+        phone: this.participant.phone || '',
         shares: this.participant.shares || 0,
         isActive: this.participant.isActive ?? true,
         isNew: this.participant.isNew ?? false
@@ -100,6 +102,7 @@ export class ParticipantDialogComponent implements OnChanges {
     const participantData: Partial<Participante> = {
       name: this.formData.name?.trim() || '',
       email: this.formData.email?.trim() || '',
+      phone: this.formData.phone?.trim() || undefined, // Incluir el teléfono si existe
       password: this.editMode ? undefined : (this.formData.password || this.defaultPassword),
       role: 'participant',
       shares: typeof this.formData.shares === 'number' ? this.formData.shares : 0,

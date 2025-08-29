@@ -6,6 +6,7 @@ export interface CreateParticipantDto {
   email: string;
   password: string;
   name: string;
+  phone?: string;
   role?: string;
   shares?: number;
 }
@@ -81,8 +82,10 @@ export class ParticipanteService {
     // Asegurarse de que el rol tenga un valor por defecto si no se proporciona
     const data = {
       ...participant,
+      phone: participant.phone || undefined, // Enviar undefined si no hay teléfono
       role: participant.role || 'participant'
     };
+    console.log('Sending data to backend:', data);
     return this.http.post<Participante>('http://localhost:3000/auth/register', data);
   }
 }

@@ -58,6 +58,9 @@
               <p class="text-sm sm:text-base text-surface-600 dark:text-surface-700 truncate font-display" [title]="participante.email">
                 {{ participante.email }}
               </p>
+              <p *ngIf="participante.phone" class="text-sm sm:text-base text-surface-600 dark:text-surface-700 truncate font-display">
+                <i class="pi pi-phone mr-1"></i> {{ participante.phone }}
+              </p>
               <div class="flex items-center gap-2 mt-1">
                 <span class="text-xs font-medium text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-full">
                   {{ participante.shares || 0 }} acciones

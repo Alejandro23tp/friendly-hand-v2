@@ -16,6 +16,7 @@ import { NotificationService } from '../../services/notification.service';
 export interface ParticipantInfo {
   name: string;
   email: string;
+  phone?: string;
   weeklyContribution: number;
 }
 

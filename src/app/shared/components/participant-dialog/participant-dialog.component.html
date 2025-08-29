@@ -37,6 +37,17 @@
     </div>
 
     <div class="field mt-4">
+      <label for="phone" class="block text-sm font-medium mb-2">
+        Teléfono
+      </label>
+      <input id="phone" type="tel" pInputText [(ngModel)]="formData.phone" [disabled]="loading"
+            class="w-full" [autocomplete]="'tel'" />
+      <small class="text-gray-500 dark:text-gray-400 block mt-1">
+        <i class="pi pi-info-circle mr-1"></i> Opcional
+      </small>
+    </div>
+
+    <div class="field mt-4">
       <div class="flex items-center justify-between">
         <label for="isNewToggle" class="text-sm font-medium text-gray-700 dark:text-gray-200 flex items-center cursor-pointer">
           <span>Participante Nuevo</span>

@@ -297,6 +297,7 @@ export class Participantes implements OnInit {
       const updateData = {
         name: participantData.name,
         email: participantData.email,
+        phone: participantData.phone || undefined, // Incluir el teléfono en la actualización
         shares: participantData.shares,
         isActive: participantData.isActive,
         isNew: participantData.isNew
@@ -324,6 +325,7 @@ export class Participantes implements OnInit {
       const newParticipant = {
         name: participantData.name || '',
         email: participantData.email || '',
+        phone: participantData.phone || undefined,
         password: participantData.password || this.defaultPassword,
         role: 'participant',
         shares: typeof participantData.shares === 'number' ? participantData.shares : 0,
@@ -409,8 +411,6 @@ export class Participantes implements OnInit {
     if (this.selectedParticipante.email && !this.isValidEmail(this.selectedParticipante.email)) {
       return;
     }
-
-    console.log('Saving participant with isNew:', this.selectedParticipante.isNew); // Debug log
 
     // Llamar al método handleSave con los datos del participante
     this.handleSave({

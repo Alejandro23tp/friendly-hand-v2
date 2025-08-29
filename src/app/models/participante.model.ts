@@ -2,6 +2,7 @@ export interface Participante {
   id: string;
   email: string;
   name: string;
+  phone?: string;
   isActive: boolean;
   isNew: boolean;
   role: string;
@@ -14,6 +15,7 @@ export interface Participante {
 export interface UpdateParticipantDto {
   name?: string;
   email?: string;
+  phone?: string;
   shares?: number;
   isNew?: boolean;
 }
